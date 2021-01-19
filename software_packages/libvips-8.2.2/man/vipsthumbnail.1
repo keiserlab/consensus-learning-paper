@@ -1,0 +1,127 @@
+.TH VIPSTHUMBNAIL 1 "13 May 2010"
+.SH NAME
+vipsthumbnail \- make thumbnails of image files
+.SH SYNOPSIS
+.B vipsthumbnail [flags] imagefile1 imagefile2 ...
+.SH DESCRIPTION
+.B vipsthumbnail(1)
+processes each 
+.B imagefile
+in turn, shrinking each image to fit within a 128 by 128 pixel square.
+The shrunk image is written to a new file named
+.B tn_imagefile.jpg.
+This program is typically faster and uses less memory than
+other image thumbnail programs.
+
+For example:
+
+ $ vipsthumbnail fred.png jim.tif
+
+will read image files 
+.B fred.png
+and 
+.B jim.tif
+and write thumbnails to the files
+.B tn_fred.jpg
+and
+.B tn_jim.jpg.
+
+ $ vipsthumbnail --size=64 -f thumbnails/%s.png fred.jpg
+
+will read image file
+.B fred.jpg
+and write a 64 x 64 pixel thumbnail to the file 
+.B thumbnails/fred.png.
+
+.SH OPTIONS
+.TP
+.B -s N, --size=N
+Set the output thumbnail size to 
+.B N 
+x 
+.B N 
+pixels. You can use MxN to specify a rectangular bounding box.
+The image is shrunk so that it just fits within this area, images
+which are smaller than this are expanded.
+
+.TP
+.B -f FORMAT, --format=FORMAT     
+Set the output format string. The input filename has any file type suffix
+removed, then that value is substitued into 
+.B FORMAT
+replacing
+.B %s. If 
+.B FORMAT
+is a relative path, the name of the input directory is prepended. In other
+words, any path in
+.B FORMAT
+is relative to the directory of the current input file.
+
+The default value is
+.B tn_%s.jpg
+meaning JPEG output, with
+.B tn_
+prepended. You can add format options too, for example
+.B tn_%s.jpg[Q=20]
+will write JPEG images with Q set to 20.
+
+.TP
+.B -p I, --interpolator=I               
+Resample with interpolator 
+.B I.
+Use 
+.B vips --list classes
+to see a list of valid interpolators. The default is 
+.B bilinear.
+
+.TP
+.B -r, --sharpen=none|mild|MASKFILE
+Images can look a little soft after shrinking.  This option lets you specify
+a sharpening mask. Use "none" to disable sharpening, or "mild" to sharpen
+lightly, or give the filename of a custom mask file to use. The default is
+"mild".  The built-in mild sharpen mask is:
+
+ 3 3 24 0
+ -1 -1 -1
+ -1 32 -1
+ -1 -1 -1
+
+.TP
+.B -e PROFILE, --eprofile=PROFILE        
+Export thumbnails with this ICC profile. Images are only colour-transformed if
+there is both an output and an input profile available. The input profile can
+either be embedded in the input image or supplied with the
+.B --iprofile
+option.
+
+.TP
+.B -i PROFILE, --iprofile=PROFILE        
+Import images with this ICC profile, if no profile is embdedded in the image. 
+Images are only colour-transformed if
+there is both an output and an input profile available. The output profile
+should be supplied with the
+.B --oprofile
+option.
+
+.TP
+.B -c, --crop
+Crop the output image down. The image is shrunk so as to completely fill the
+bounding box in both axies, then any excess is cropped off. 
+
+.TP
+.B -d, --delete
+Delete the output profile from the image. This can save a small amount of
+space. 
+
+.TP
+.B -v, --verbose
+.B vipsthumbnail(1)
+normally runs silently, except for warning and error messages. This option
+makes it print a list of the operations it performs on each image.
+
+.SH RETURN VALUE
+returns 0 on success and non-zero on error. Error can mean one or more
+conversions failed.
+
+.SH SEE ALSO
+vipsheader(1)

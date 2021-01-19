@@ -1,0 +1,10 @@
+prefix=/srv/home/dwong/consensus-learning-paper
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: vipsCC
+Description: deprecated C++ API for vips image processing library
+Version: 8.2.2
+Requires: vips = 8.2.2
+Libs: -L${libdir} -lvipsCC

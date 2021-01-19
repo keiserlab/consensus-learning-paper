@@ -1,0 +1,4 @@
+nohup: ignoring input
+/srv/home/dwong/anaconda3/lib/python3.7/site-packages/torch/nn/_reduction.py:43: UserWarning: size_average and reduce args will be deprecated, please use reduction='sum' instead.
+  warnings.warn(warning.format(ret))
+findfont: Font family ['Times New Roman'] not found. Falling back to DejaVu Sans.
