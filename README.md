@@ -28,34 +28,34 @@ All deep learning models were trained using Nvidia Geforce GTX 1080 GPUs
 
 ## Code:
 
-**preprocess_WSIs.py** Preprocesses the raw WSIs by color normalizing them and tiling them down to 1536 x 1535 pixel images.<br />
+* **preprocess_WSIs.py** Preprocesses the raw WSIs by color normalizing them and tiling them down to 1536 x 1535 pixel images.<br />
 
-**blob_detect.py** Extract the 256 x 256 pixel, plaque-centered images from the 1536 x 1536 pixel images.<br />
+* **blob_detect.py** Extract the 256 x 256 pixel, plaque-centered images from the 1536 x 1536 pixel images.<br />
 
-**data_prep.py** Generates various CSVs and get things ready for the deep learning pipeline.<br /> 
+* **data_prep.py** Generates various CSVs and get things ready for the deep learning pipeline.<br /> 
 
-**core.py** Contains the core class and method definitions for the whole study.<br />
+* **core.py** Contains the core class and method definitions for the whole study.<br />
 
-**figure.py** Plots the figures shown in the paper.<br />
+* **figure.py** Plots the figures shown in the paper.<br />
 
-**train.py** Contains code for training both the single CNNs as well as the ensemble CNNs.<br />
+* **train.py** Contains code for training both the single CNNs as well as the ensemble CNNs.<br />
 
-**training_bash.sh** is a convenient bash script to train all of the models necessary for this study.<br />
+* **training_bash.sh** is a convenient bash script to train all of the models necessary for this study.<br />
 
-**phase2.py** Contains code necessary for phase 2 of the study.<br />
+* **phase2.py** Contains code necessary for phase 2 of the study.<br />
 
-**analysis.py** is the main runner code for the analysis of the entire study. <br />
+* **analysis.py** is the main runner code for the analysis of the entire study. <br />
 
-**venn.py** is helper code to produce the venn diagram figure.<br />
+* **venn.py** is helper code to produce the venn diagram figure.<br />
 
-**clear.py** clears figures/ and outputs/ directories.<br />
+* **clear.py** clears figures/ and outputs/ directories.<br />
 
-**normalize.py** performs the Reinhard color normalization process <br />
+* **normalize.py** performs the Reinhard color normalization process <br />
 
-**vips_utls.py** contains image preprocessing helper code relevant to PyVips.
+* **vips_utls.py** contains image preprocessing helper code relevant to PyVips.
 
 ## Other content: 
-**models:**<br />
+* **models:**<br />
 This folder contains the fully trained models. "Thresholding" refers to a consensus-of-n model. "Random subnet" refers to ensemble models that contain a single random constituent CNN. "Multiple subnets" refers to ensembles that contain 5 total random constituent CNNs. <br />
 
 * **csvs/**<br />
@@ -73,19 +73,19 @@ This folder contains the CSVs for the study <br />
     *    **image_details_phase2.csv** contains a subset of the output from blob_detect.py pertaining to phase 2 images. Specifies things like plaque coordinates, tile coordinates, etc.<br />
     *    **individualModelPredictionsForConsensusImageSet.csv** contains model predictions on the images enriched for by the consensus-of-two model.<br />
 
-**CAM_images/** contains the guided Grad-CAM images. <br /> 
+* **CAM_images/** contains the guided Grad-CAM images. <br /> 
 
-**figures/** is the output directory to save figures. <br /> 
+* **figures/** is the output directory to save figures. <br /> 
 
-**outputs/** is a temporary scratch directory. <br /> 
+* **outputs/** is a temporary scratch directory. <br /> 
 
-**pickles/** is the output directory to save pickle files containing results and intermediate data. <br /> 
+* **pickles/** is the output directory to save pickle files containing results and intermediate data. <br /> 
 
-**software_packages/** contains the relevant software packages used for WSI preprocessing. <br /> 
+* **software_packages/** contains the relevant software packages used for WSI preprocessing. <br /> 
 
-**tile_seg/** contains the 256 x 256 pixel images. These images are used for training and evaluation. <br /> 
+* **tile_seg/** contains the 256 x 256 pixel images. These images are used for training and evaluation. <br /> 
 
-**utils/** contains image normalization data. <br /> 
+* **utils/** contains image normalization data. <br /> 
 
 
 
