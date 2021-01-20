@@ -4,7 +4,7 @@ author: Daniel Wong (wongdanr@gmail.com)
 
 ## Open access image data
 https://osf.io/xh2jd/ <br />
-Identifier: 
+Identifier: (place here when publish)
 
 ## The following python packages are required: 
 pyvips 2.1.2  <br />
