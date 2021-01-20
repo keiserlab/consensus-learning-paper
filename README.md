@@ -55,6 +55,9 @@ All deep learning models were trained using Nvidia Geforce GTX 1080 GPUs
 * **vips_utls.py** contains image preprocessing helper code relevant to PyVips.
 
 ## Other content: 
+
+* **pyvips_install_readme** is a text file that contains directions to install the necessary software packages for preprocessing the WSIs. <br /> 
+
 * **models:**<br />
 This folder contains the fully trained models. "Thresholding" refers to a consensus-of-n model. "Random subnet" refers to ensemble models that contain a single random constituent CNN. "Multiple subnets" refers to ensembles that contain 5 total random constituent CNNs. <br />
 
@@ -86,6 +89,8 @@ This folder contains the CSVs for the study <br />
 * **tile_seg/** contains the 256 x 256 pixel images. These images are used for training and evaluation. <br /> 
 
 * **utils/** contains image normalization data. <br /> 
+
+
 
 
 
