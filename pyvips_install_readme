@@ -1,0 +1,36 @@
+INSTRUCTIONS FOR NECESSARY PYVIPS PACKAGE INSTALLS
+
+For the WSI normalization and coloring, we need pyvips==2.1.2, libvips==8.2.2-1, and libgsf-dev>=1.14.27 
+
+Newer pyvips/libvips versions result in slightly different color norm and tiling results
+
+pyvips 2.1.2 can be installed easily:
+	~/anaconda3/envs/{env_name}/bin/pip install pyvips==2.1.2
+
+We also need libgsf-dev (because libvips needs this for dzsave)
+
+unpack libgsf-dev from source libgsf-1.14.30.tar.xz (see https://chrishewett.com/blog/vips-dzsave-build-from-source-on-centos-7-0/ for reference):
+	wget http://ftp.gnome.org/pub/gnome/sources/libgsf/1.14/libgsf-1.14.30.tar.xz
+	tar -xf libgsf-1.14.30.tar.xz
+	cd libgsf-1.14.30
+	./configure --prefix=/srv/home/dwong/consensus-learning-paper/
+	make
+	make install
+	# add this path to the PKG_CONFIG_PATH environment variable
+	export PKG_CONFIG_PATH=/srv/home/dwong/consensus-learning-paper/
+
+verify libgsf-dev is installed and newer than 1.14.26 
+($'pkg-config libgsf-1 --modversion’ must be >= 1.14.27)
+
+install libvips from source because this version is a little bit old (https://launchpad.net/ubuntu/+source/vips/8.2.2-1):
+	tar -xf vips_8.2.2.orig.tar.gz
+	cd vips-8.2.2
+	./configure --prefix=/srv/home/dwong/consensus-learning-paper/
+		(verify that libgsf is enabled 'yes' at the end of the config summary)
+	make 
+	make install
+
+
+
+
+
