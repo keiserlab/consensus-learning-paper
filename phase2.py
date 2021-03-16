@@ -546,6 +546,11 @@ def plotAverageDifferentials(toggle="A"):
         y_auprc_err = [differential_dict[am_class]["AUPRC"][1] for am_class in ["cored", "diffuse", "CAA"]]
         y_auroc = [differential_dict[am_class]["AUROC"][0] for am_class in ["cored", "diffuse", "CAA"]]
         y_auroc_err = [differential_dict[am_class]["AUROC"][1] for am_class in ["cored", "diffuse", "CAA"]]
+        print(benchmark_type)
+        print(y_auprc)
+        print(y_auprc_err)
+        print(y_auroc)
+        print(y_auroc_err)
         ax.bar(x, y_auprc, width, yerr=y_auprc_err, capsize=3, color="olivedrab", label="AUPRC")
         ax.bar(x + width, y_auroc, width, yerr=y_auroc_err, capsize=3, color="yellow", label="AUROC")
         if toggle == "A":

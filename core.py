@@ -1558,6 +1558,34 @@ def stratifyPerformanceByStainType(DATA_DIR=None, data_transforms=None, num_work
     pickle.dump(results, open("pickles/compare_stain_types_images.pkl", "wb"))
     pickle.dump(counts_dict, open("pickles/stain_type_counts_dict_test_set.pkl", "wb"))
 
+def getRandomAUPRCBaseline():
+    """
+    Calculates random AUPRC for individuals and consensus across test set
+    Random AUPRC is P / (P + N)
+    Saves this as a pickle of dictionary with key: "individual" or "consensus", key: amyloid_class, value: (mean, std)
+    """
+    amyloid_classes = ["cored", "diffuse", "CAA"]
+    baseline_mapp = {typ : {amyloid_class: [] for amyloid_class in amyloid_classes } for typ in ["individual", "consensus"]}
+    tests = ["NP{}".format(i) for i in range(1, 6)] + ["entire_test_thresholding_{}".format(i) for i in range(1,6)]
+    for test in tests:
+        if "NP" in test:
+            df = pd.read_csv("csvs/phase1/test_set/{}_test_set.csv".format(test))
+        if "thresholding" in test:
+            df = pd.read_csv("csvs/phase1/test_set/{}.csv".format(test))
+        for amyloid_class in amyloid_classes:
+            positives = df[df[amyloid_class] >= 0.99][amyloid_class].count()
+            negatives = len(df[amyloid_class]) - positives
+            random = positives / float(positives + negatives)
+            if "NP" in test:
+                baseline_mapp["individual"][amyloid_class].append(random)
+            if "thresholding" in test:
+                baseline_mapp["consensus"][amyloid_class].append(random)
+    ##average 
+    for key in baseline_mapp:
+        for amyloid_class in amyloid_classes:
+            baseline_mapp[key][amyloid_class] = (np.mean(baseline_mapp[key][amyloid_class]), np.std(baseline_mapp[key][amyloid_class]))
+    pickle.dump(baseline_mapp, open("pickles/random_AUPRC_baseline.pkl", "wb"))
+
 ##==================================================================
 #3) HELPER FUNCTIONS
 ##==================================================================
@@ -1760,5 +1788,59 @@ def guided_grad_cam(grad_cam_mask, guided_backprop_mask):
     """
     cam_gb = np.multiply(grad_cam_mask, guided_backprop_mask)
     return cam_gb
+
+def compareColorNormalizedTestingToUnNormalized(DATA_DIR=None, RAW_DATA_DIR=None, data_transforms=None, num_workers=None):
+    """
+    loads each model (fold 3), runs through the held-out test set and evaluates performance with color-normalized images,
+    versus performance without color normalization, saves results in dictionary called "pickles/compare_color_norm_vs_unnorm.pkl"
+    DATA_DIR: directory of color normalized images
+    RAW_DATA_DIR: directory of unnormalized images
+    DATA_TRANSFORMS dictionary specifying how to preprocess the image, key: phase (either "train" or "dev", value: transforms.Compose object
+    NUM_WORKERS: How many cores to use for processing
+    """
+    USERS = ["UG{}".format(i) for i in [1,2]] + ["NP{}".format(i) for i in range(1,6)]
+    pairs = [("csvs/phase1/test_set/entire_test_thresholding_2.csv","models/model_all_fold_3_thresholding_2_l2.pkl" )] + [("csvs/phase1/test_set/" + x + "_test_set.csv", "models/model_" + x + "_fold_3_l2.pkl") for x in USERS] 
+    ##iterate over every pair of user csvs and models
+    color_norm_dict = {is_norm : {u: {0: 0, 1:0, 2:0}  for u in USERS + ["thresholding_2"]} for is_norm in ["color_norm", "unnorm"]} #key: user, key: 1 of 3 classes, value: AUPRC over test set 
+    for pair in pairs:
+        csv = pair[0]
+        modelName = pair[1]
+        model = torch.load(modelName)
+        color_normalized_dataset = MultilabelDataset(csv, DATA_DIR, threshold=.99,  transform=data_transforms['dev'])
+        color_normalized_generator = torch.utils.data.DataLoader(color_normalized_dataset, batch_size=1, shuffle=True, num_workers=num_workers)
+        non_color_normalized_dataset = MultilabelDataset(csv, RAW_DATA_DIR, threshold=.99,  transform=data_transforms['dev'])
+        non_color_normalized_generator = torch.utils.data.DataLoader(non_color_normalized_dataset, batch_size=1, shuffle=True, num_workers=num_workers)
+
+        with torch.set_grad_enabled(False):
+            for validation_generator in [non_color_normalized_generator, color_normalized_generator]:
+                running_val_total = 0
+                running_val_corrects = torch.zeros(3) #3 elements
+                running_val_preds = torch.Tensor(0)         
+                running_val_labels = torch.Tensor(0)
+                missed_examples = 0 
+                for data in validation_generator:    
+                    inputs, labels, raw_labels, names = data
+                    running_val_labels = torch.cat([running_val_labels, labels])
+                    inputs = Variable(inputs.cuda(), requires_grad=False)
+                    labels = Variable(labels.cuda())
+                    outputs = model(inputs) 
+                    predictions = (torch.sigmoid(outputs)>0.5).type(torch.cuda.FloatTensor)
+                    running_val_total += len(labels)
+                    running_val_corrects += torch.sum(predictions==labels, 0).data.type(torch.FloatTensor)
+                    preds = torch.sigmoid(outputs)
+                    preds = preds.data.cpu()
+                    running_val_preds = torch.cat([running_val_preds, preds])
+                val_acc = running_val_corrects / running_val_total
+                for class_type in [0,1,2]:   
+                    running_val_preds_specific_class = running_val_preds.numpy()[:,class_type].ravel()
+                    running_val_labels_specific_class = running_val_labels.numpy()[:,class_type].ravel()
+                    precision, recall, _ = precision_recall_curve(running_val_labels_specific_class, running_val_preds_specific_class)
+                    val_auprc = auc(recall, precision)
+                    val_auroc = roc_auc_score(running_val_labels_specific_class,running_val_preds_specific_class)
+                    if validation_generator == color_normalized_generator:
+                        color_norm_dict["color_norm"][getUser(pair[0])][class_type] = val_auprc
+                    if validation_generator == non_color_normalized_generator:
+                        color_norm_dict["unnorm"][getUser(pair[0])][class_type] = val_auprc
+    pickle.dump(color_norm_dict, open("pickles/compare_color_norm_vs_unnorm.pkl", "wb"))
 
 

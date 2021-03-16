@@ -198,8 +198,8 @@ def plotInterraterAgreement(exclude_amateurs=False, phase="phase1", test_set_onl
             
 def getAverageIndividualOrConsensusMetrics():
     """
-    for each of the 3 amyloid classes, will plot average AUROC and average AUPRC over inidividual models, consensus models, and both 
-    exclude amateurs
+    for each of the 3 amyloid classes, will plot average AUROC and average AUPRC over inidividual models, consensus models, and random baseline 
+    excludes amateurs
     """
     metrics = ["AUPRC", "AUROC"]
     classes = [0, 1, 2]
@@ -232,6 +232,15 @@ def getAverageIndividualOrConsensusMetrics():
     individ_AUPRC_errs = [i[1] for i in diagonals_mapp["individual"]["AUPRC"]]
     individ_AUROCs = [i[0] for i in diagonals_mapp["individual"]["AUROC"]]
     individ_AUROC_errs = [i[1] for i in diagonals_mapp["individual"]["AUROC"]]
+    
+    baseline_AUPRC_mapp = pickle.load(open("pickles/random_AUPRC_baseline.pkl", "rb"))
+    amyloid_classes = ["cored", "diffuse", "CAA"]
+    rand_cons_AUPRCs = [baseline_AUPRC_mapp["consensus"][amyloid_class][0] for amyloid_class in amyloid_classes]
+    rand_cons_AUPRC_errs = [baseline_AUPRC_mapp["consensus"][amyloid_class][1] for amyloid_class in amyloid_classes]
+    rand_individ_AUPRCs =  [baseline_AUPRC_mapp["individual"][amyloid_class][0] for amyloid_class in amyloid_classes]
+    rand_individ_AUPRC_errs =  [baseline_AUPRC_mapp["individual"][amyloid_class][1] for amyloid_class in amyloid_classes]
+    rand_AUROCs = [0.5, 0.5, 0.5]
+
     print("cons AUPRCs", cons_AUPRCs)
     print("cons AUPRCs error", cons_AUPRC_errs)
     print("individual AUPRCs", individ_AUPRCs)
@@ -249,12 +258,17 @@ def getAverageIndividualOrConsensusMetrics():
     xlabels = ["null"] + classes
     ax.bar(x, individ_AUPRCs, width, yerr=individ_AUPRC_errs, capsize=3, ecolor="grey", color="blue", label="Experts AUPRC", zorder=3)
     ax.bar(x, cons_AUPRCs, width,  yerr=cons_AUPRC_errs, capsize=3, color="purple", label="Consensus AUPRC")
+    ax.bar(x, rand_individ_AUPRCs, width, yerr=rand_individ_AUPRC_errs, capsize=3, ecolor="white", color="grey", label="Random AUPRC", zorder=4)
+    ##random individ and random consensus are equal to two decimal places, just plot one
+    # ax.bar(x, rand_cons_AUPRCs, width, yerr=rand_cons_AUPRC_errs, capsize=3, ecolor="white", color="grey", label="Random Consensus AUPRC", zorder=4)
     ax.bar(x + width, individ_AUROCs, width, yerr=individ_AUROC_errs, capsize=3, ecolor="grey", color="gold", label="Experts AUROC",zorder=3)
     ax.bar(x + width, cons_AUROCs, width, yerr=cons_AUROC_errs, capsize=3, color="goldenrod", label="Consensus AUROC")
+    ax.bar(x + width, rand_AUROCs, width, capsize=3, color="lightgrey", label="Random AUROC", zorder=4)
+
     box = ax.get_position()
-    ax.set_position([box.x0, box.y0, box.width, box.height * 0.85])
-    ax.legend(loc='upper right', fontsize=10, bbox_to_anchor=(1, 1.39))
-    plt.gcf().subplots_adjust(bottom=0.13, top=.76)
+    ax.set_position([box.x0, box.y0, box.width, box.height * 0.80])
+    ax.legend(loc='upper right', fontsize=9, bbox_to_anchor=(1, 1.52))
+    plt.gcf().subplots_adjust(top=.69)
     ax.set_ylim((0,1.02))
     ax.xaxis.set_major_locator(plt.MaxNLocator(3))
     ax.set_xticklabels(xlabels,fontsize=10)
@@ -385,19 +399,19 @@ def plotNoviceAndConsensusOf2Stats(amateur="UG1"):
    
 def plotNoviceWithConsensusOf2Difference(amateur="UG1", amyloid_class=None):
     #make figure, line graph for each class, across all thresholds
-    ##make graph 
+    ##make graph
     granular_thresholds = list(np.arange(0,20, 2)) + list(np.arange(20, 260, 25)) + [255] #more granular search space
     larger_thresholds = list(np.arange(0,260, 15))  #uniform axis with more spaced out thresholds
     thresh_dict = pickle.load(open("pickles/CAM_threshold_stats_{}_{}.pkl".format(amateur, amyloid_class), "rb"))
     for graph_type in ["exclude_agreements", "keep_agreements"]:
         fig, ax = plt.subplots()
         if graph_type == "exclude_agreements":
-            granular_thresholds = list(np.arange(0,20, 2)) + list(np.arange(20, 121, 25))  #more granular search space
-            x = np.arange(len(granular_thresholds))
             thresholds = granular_thresholds
         else:
-            x = np.arange(len(larger_thresholds))
             thresholds = larger_thresholds
+        # thresholds = sorted(list(set(larger_thresholds)))
+        x = np.arange(len(thresholds))
+
         xlabels = [""] + thresholds
         A = [thresh_dict[t]["A"][0] for t in thresholds]
         A_err = [thresh_dict[t]["A"][1] for t in thresholds]
@@ -413,24 +427,34 @@ def plotNoviceWithConsensusOf2Difference(amateur="UG1", amyloid_class=None):
             ax.errorbar(x, B, color="green", label="novice and consensus agree")
             plt.fill_between(x, np.array(B) - np.array(B_err), np.array(B) + np.array(B_err), color='green', alpha=0.05)
         ax.xaxis.set_major_locator(plt.MaxNLocator(len(thresholds) + 1))
-        yvals = ax.get_yticks()
+        # if graph_type == "keep_agreements":
+        #     xfontsize, yfontsize, xrotation = 12, 12, 45
+        # else:
+        #     xfontsize, yfontsize, xrotation = 15, 16, 50
+        xfontsize, yfontsize, xrotation = 12, 12, 45
+        
         if graph_type == "keep_agreements":
-            xfontsize, yfontsize, xrotation = 12, 12, 45
+            ax.set_ylim((0,1))
         else:
-            xfontsize, yfontsize, xrotation = 15, 16, 50
+            ax.set_ylim((0,.30))   
+
+        yvals = ax.get_yticks()
         ax.set_yticklabels(['{:,.0%}'.format(x) for x in yvals], fontsize=yfontsize)
+            
         ax.set_xticklabels(xlabels,fontsize=xfontsize)
         plt.setp(ax.get_xticklabels(), rotation=xrotation, ha="right",rotation_mode="anchor")
         am_types = {0: "Cored", 1:"Diffuse", 2:"CAA"}
+        
+        ax.set_xlabel("Pixel Threshold", fontsize=12)
+        ax.set_ylabel("Proportion", fontsize=12)  
+        plt.title("{}".format(am_types[amyloid_class]), fontsize=14)
+        #Shrink current axis and place legend outside plot, top right corner 
+        box = ax.get_position()
+        ax.set_position([box.x0, box.y0, box.width, box.height * 0.85])
+        ax.legend(loc='upper left', fontsize=12, bbox_to_anchor=(-0.012, 1.39))
+        plt.gcf().subplots_adjust(bottom=0.13, top=.76) #default: left = 0.125, right = 0.9, bottom = 0.1, top = 0.9
+        # plt.tight_layout()
         if graph_type == "keep_agreements":
-            ax.set_xlabel("Pixel Threshold", fontsize=12)
-            ax.set_ylabel("Proportion", fontsize=12)  
-            plt.title("{}".format(am_types[amyloid_class]), fontsize=14)
-            #Shrink current axis and place legend outside plot, top right corner 
-            box = ax.get_position()
-            ax.set_position([box.x0, box.y0, box.width, box.height * 0.85])
-            ax.legend(loc='upper left', fontsize=12, bbox_to_anchor=(-0.012, 1.39))
-            plt.gcf().subplots_adjust(bottom=0.13, top=.76) #default: left = 0.125, right = 0.9, bottom = 0.1, top = 0.9
             plt.savefig("figures/CAM_overlap_exclude_{}_{}_{}.png".format(graph_type, amateur, amyloid_class), dpi=300)
         else:
             plt.savefig("figures/CAM_overlap_exclude_{}_{}_{}.png".format(graph_type, amateur, amyloid_class), bbox_inches='tight', dpi=300)
@@ -459,8 +483,9 @@ def plotSubsetPercentageConsensusOf2WithAmateur(amateur="UG1", amyloid_class=Non
     #Shrink current axis and place legend outside plot, top right corner 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width, box.height * 0.85])
-    ax.legend(loc='upper left', fontsize=12, bbox_to_anchor=(-.012, 1.31))
+    ax.legend(loc='upper left', fontsize=12, bbox_to_anchor=(-.012, 1.39))
     plt.gcf().subplots_adjust(bottom=0.135, top=.76) #default: left = 0.125, right = 0.9, bottom = 0.1, top = 0.9
+    # plt.tight_layout()
     plt.savefig("figures/CAM_subset_percentages_{}_{}.png".format(amateur, amyloid_class), dpi=300)
 
 def plotEnsembleSuperiority(random_subnet=False, multiple_subnets=False):
@@ -504,21 +529,50 @@ def plotEnsembleDiffHistograms(single_random=False, multiple_subnets=False):
     diffuse = pickle.load(open("pickles/ensemble_difference_values_1_random_{}_multiple_{}.pkl".format(single_random, multiple_subnets), "rb"))
     CAA = pickle.load(open("pickles/ensemble_difference_values_2_random_{}_multiple_{}.pkl".format(single_random, multiple_subnets), "rb"))
     X = np.transpose(np.array([cored, diffuse, CAA]))
+    print(X.shape)
     fig, ax = plt.subplots()
     colors = ["maroon", "bisque", "darkorange"]
-    n, bins, patches = ax.hist(X, 20, histtype='bar', color=colors, label=["Cored", "Diffuse", "CAA"]) #side by side bars
-    ax.set_xlabel("Absolute Value of AUPRC Difference", fontsize=10)
-    ax.set_ylabel("Count", fontsize=10)
+    # n, bins, patches = ax.hist(X, 20, histtype='bar', color=colors, label=["Cored", "Diffuse", "CAA"]) #side by side bars
+    # n, bins, patches = ax.hist(X, 20, histtype='step', stacked=True, fill=False, color=colors, label=["Cored", "Diffuse", "CAA"]) #unfilled steps
+    # n, bins, patches = ax.hist(X, 10, density=True, histtype='barstacked', stacked=True, color=colors, label=["Cored", "Diffuse", "CAA"])# stacked bars
+    
+
+    n, bins, patches = ax.hist(X, 10, histtype='barstacked', stacked=True, color=colors, label=["Cored", "Diffuse", "CAA"])# stacked bars
+    n = np.array(n)
+    sum_of_rows = n.sum(axis=1)
+    normalized_n = n / sum_of_rows[:, np.newaxis]
+    print(len(normalized_n), normalized_n)
+    print("bins", len(bins), bins)
+    new_x = [] ##midpoint between each bin coordinate
+    for i in range(0, len(bins) - 1):
+        new_x.append(bins[i] + (bins[i+1] - bins[i] / float(2)))
+    print(len(new_x), new_x)
+    print(normalized_n.shape)
+    fig, ax = plt.subplots()
+    amyloid_classes = ["Cored", "Diffuse", "CAA"]
+    width = new_x[1] - new_x[0]
+    for i in range(0, 3):
+        ax.bar(new_x, normalized_n[i], width=width, color='None', edgecolor=colors[i], label=amyloid_classes[i])
+    ax.set_ylim(0,1) 
+    y_vals = ax.get_yticks()
+    ax.set_yticklabels(['{:,.0%}'.format(y) for y in y_vals])  
+
+
+
+
+
+    
+    ax.set_ylabel("Frequency", fontsize=10)
     if single_random:
-        ax.set_title("Histograms of AUPRC Differences\nBetween Ensemble and Ensemble with Random Labeler", fontsize=12, y = 1.03)
+        ax.set_xlabel("|AUPRC Difference|\nBetween Ensemble and Ensemble with Random Labeler", fontsize=10)
     else:
-        ax.set_title("Histograms of AUPRC Differences\nBetween Ensemble and Ensemble with Multiple Random Labelers",fontsize=12, y = 1.03)
-    ax.set_ylim((0, 100))
+        ax.set_xlabel("|AUPRC Difference|\nBetween Ensemble and Ensemble with Multiple Random Labelers", fontsize=10)
+    ax.set_title("Ensemble AUPRC Differences Over All Benchmarks", fontsize=12, y = 1.03)     
     ##top right corner 
     box = ax.get_position()
     ax.set_position([box.x0, box.y0, box.width, box.height * 0.85])
     ax.legend(loc='upper right', fontsize=9, bbox_to_anchor=(1, 1.35))
-    plt.gcf().subplots_adjust(top=.76)
+    plt.gcf().subplots_adjust(bottom=.17, top=.76)
     if single_random:
         plt.savefig("figures/histogram_effect_of_random_on_ensemble_class.png", dpi=300)
     if multiple_subnets:
@@ -816,7 +870,7 @@ def plotStainUserClassCounts(dataset="full"):
         xlabels = ['null'] + USERS
         xlabels = ["C2" if x == "thresholding_2" else x for x in xlabels]
         ax.set_xticklabels(xlabels,fontsize=10)
-        ax.set_xlabel("Expert Annotator", fontsize=10)
+        ax.set_xlabel("Annotator", fontsize=10)
         ax.set_ylabel("Number of Positive Annotations", fontsize=10)
         y_vals = ax.get_yticks()
         plt.title("Positive {} Annotation Counts in {} Dataset".format(amyloid_dict[amyloid_class], dataset.capitalize()), fontsize=14, y = 1.01)
@@ -827,7 +881,35 @@ def plotStainUserClassCounts(dataset="full"):
         plt.gcf().subplots_adjust(top=.76)   
         plt.savefig("figures/positive_counts_by_stain_type_{}_set_{}.png".format(dataset, amyloid_class), dpi=300)
 
-
+def plotColorNormVsUnnormalized():
+    color_norm_dict = pickle.load(open("pickles/compare_color_norm_vs_unnorm.pkl", "rb"))
+    users = list(color_norm_dict["color_norm"].keys())
+    differences_dict = {user: {0:0, 1:0, 2:0} for user in users}
+    for user in users:
+        for amyloid_class in color_norm_dict["color_norm"][user]:
+            differences_dict[user][amyloid_class] = color_norm_dict["color_norm"][user][amyloid_class] - color_norm_dict["unnorm"][user][amyloid_class] 
+    fig, ax = plt.subplots()
+    x = np.arange(len(users))
+    margin = 0
+    width = .20
+    colors = ["maroon", "bisque", "darkorange"]
+    amyloid_dict = {0: "Cored", 1: "Diffuse", 2:"CAA"}
+    for amyloid_class in [0,1,2]:
+        scores_list = [differences_dict[user][amyloid_class] for user in users]
+        ax.bar(x + margin, scores_list, width=width, label=amyloid_dict[amyloid_class], color=colors[amyloid_class])
+        margin += width 
+    xlabels = ['null'] + users
+    xlabels = ["C2" if x == "thresholding_2" else x for x in xlabels]
+    ax.set_xticklabels(xlabels,fontsize=10)
+    ax.set_xlabel("Model", fontsize=10)
+    ax.set_ylabel("AUPRC Difference (Normalized - Unnormalized)", fontsize=10)
+    plt.title("AUPRC Difference over Test Set", fontsize=14, y = 1.01)
+    #Shrink current axis and place legend outside plot top right corner 
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width, box.height * 0.85])
+    ax.legend(loc='upper right', fontsize=9, bbox_to_anchor=(1, 1.30))
+    plt.gcf().subplots_adjust(top=.76)   
+    plt.savefig("figures/comparing_color_norm_vs_unnorm.png", dpi=300)
 
 
 
