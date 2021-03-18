@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Finish
+{% endblock %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block body%}
+    <div class="text-center">
+        <h1>Thanks!</h1>
+        <p></p>
+        <p>You have done! {{tile_labels}} records in database</p>
+
+        <img src="{{url_for('static', filename=thanks_picture)}}" width=30%>
+        <br/>
+        
+        <!-- <a href="/" class="btn btn-primary ">Home</a> -->
+        <form id="home-form" action="{{ url_for('index') }}" method="GET">
+            <div>
+                <button type="submit" class="btn btn-primary ">Home</button>
+            </div>
+        </form>
+        &nbsp;
+        <form id="undo-form" action="{{ url_for('label', username_hash=username) }}" method="POST">
+            <div>
+                <button type="submit" id="undo" name="undo" value="undo" class="btn btn-primary ">Undo</button>
+            </div>
+        </form>
+        <!-- <a href="/label" class="btn btn-primary ">Label</a> -->
+    </div>
+{% endblock %}
+
+
