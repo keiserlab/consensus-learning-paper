@@ -1,0 +1,227 @@
+<html>
+    <head>
+        <meta charset="utf-8" name="viewport" content="width=device-width,initial-scale=1"/>
+        <title>Label</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <style> 
+            #center{ MARGIN-RIGHT: auto;
+                MARGIN-LEFT: auto;
+                }
+            /*body{ margin:0; height:100%} */     
+            .box {
+                font-size: 12px;
+                font-size: calc(12px + 4 * (100vw - 1080px) / 400);
+            }
+            @media screen and (min-width: 1680px) {
+                .box {
+                    font-size: calc(16px + 2 * (100vw - 1680px) / 400);
+                }
+            }
+            @media screen and (min-width: 1920px) {
+                .box {
+                    font-size: calc(20px + 4 * (100vw - 1920px) / 400);
+                }
+            }
+            p.thick {font-weight: bold}
+            /*#form{ position:fixed; top:50%; left:45%; height:100%; }*/ 
+        </style> 
+    </head>
+
+    <body onkeydown="myFc()">
+        <div class="text-center">
+            <form style="position:fixed;left:3%;top:2%;" id="quit-form" action="{{ url_for('label', username_hash=username) }}" method="POST">
+                <div>
+                    <button type="submit" id="quit" name="quit" value="quit" class="btn btn-primary">Quit</button>
+                </div>
+            </form>
+
+            <div class="box">
+                <h3 style="background:#ffffef;">Blob or Not Labeling</h3>
+                <p id="demo">{{phase}} </p>
+
+                <font style="position:fixed;right:5%;top:8%;color:#A23400">{{"{:,}".format(ind)}} / {{"{:,}".format(total)}}</font>
+
+                <ul style="position:fixed;right:3%;top:20%;border:1px solid #999;list-style:none;width:12%;padding:5px;background:#FFFFF4;">
+                    <p class="thick">Keyboard Control:</p>
+                    <li>C：Cored</li>
+                    <li>D: Diffuse</li>
+                    <li>A：CAA</li>
+                    <li>N: Negative</li>
+                    <li>F: Flag</li>
+                    <li>1：Not Sure</li>
+                    <li>Enter：Next</li>
+                    <li>U：Undo</li>
+                </ul>
+
+                <ul style="position:fixed;left:1%;top:18%;border:1px solid #999;list-style:none;width:20%;padding:2px;background:#ffffef;">
+                    <p class="thick">Simple Instructions:</p>
+                    <p style="color:#FF0000 ">Please provide labels for only the item inscribed within the red bounding box</p>
+                    <p> The zoomed blob (image on right) is what is represented in the blue bounding box in the 10x field (image on left).</p>
+                    <dl>
+                    <li>1. Press keys on keyboard or click the checkboxes to select labels for each image.</li>
+                    <dd>(Multilabeling is available)</dd>
+                    <li>2. Press Enter or click 'Next' to confirm your annotation and skip to the next image.</li>
+                    <dd></dd>
+                    <li>3. Press 'U' or Click 'Undo' to cancel your last annotation and review the last image.</li>
+                    </dl>
+                </ul>
+
+                <br/>
+                <font style="float:center;left:5%;top:11%;color:#A23400;">{{labels_up}}</font>
+                <img src="{{url_for('static', filename=level_name)}}" style="margin-left:0;margin-top:-2%;width:2%;height:auto">
+                <font style="margin-left:20;top:11%;color:#A23400;">{{labels_down}}</font>
+                
+                <div id="center" class="progress progress-striped active" style="left:25%;width:50%;height:2%">
+                    <div class="progress-bar progress-bar-success" role="progressbar"
+                         aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"
+                         style="width: {{percent}}%">
+                        
+                    </div>
+                </div>
+        
+                <div id="center">
+                    <a style="margin-left:4%">10x field</a>
+                    <a style="margin-left:14%">zoomed blob (20x)</a>
+                </div>
+
+                
+                <canvas id="myCanvas" style="width:41%;height:auto"></canvas>
+
+                <img id="blob" src="{{raw_path}}">
+                <img id="tile" src="{{normalized_path}}">
+
+                <script>
+                    var label = {{ label|tojson|safe }};
+                    var c = document.getElementById("myCanvas");
+                    var ctx = c.getContext("2d");
+                    var drawBBox = function(xMin, xMax, yMin, yMax) {
+                        ctx.strokeStyle = "blue";
+                        ctx.fillStyle = "blue";
+                        ctx.rect(xMin, yMin, xMax - xMin, yMax - yMin);
+                        ctx.lineWidth="8";
+                        ctx.stroke();
+                    };
+                    var drawLabel = function(x, text) {                       
+                        ctx.fillStyle = "black";
+                        ctx.fillRect(x+1140, 1410, 300, 30);
+                        ctx.font = "65px Arial";
+                        ctx.fillText(text, x+1200, 1510);
+                    };
+                    var img = document.getElementById("blob");
+                    var img2 = document.getElementById("tile");
+                    var width = 1536;
+                    var spacing = 44;
+                    window.onload = function() {
+                      ctx.canvas.width = 2*img.width;
+                      ctx.canvas.height = img.height;
+                      c.width = 2*img.width+spacing;
+                      c.height = img.height;                      
+
+                      var xCenter = width / 2;
+                      var yCenter = width / 2;
+                      ctx.save();
+                      ctx.translate(xCenter, yCenter);
+                      ctx.rotate(label.rot * Math.PI / 180);
+                      ctx.translate(-xCenter, -yCenter);
+                      ctx.drawImage(img, 0, 0, width, width);
+                      drawBBox(label.xMin, label.xMax, label.yMin, label.yMax);                     
+                      ctx.restore();
+                      drawLabel(0, "150 um");                     
+
+                      var xCenter = (width * 1.5) + spacing;
+                      var yCenter = width / 2;
+                      ctx.save();
+                      ctx.translate(xCenter, yCenter);
+                      ctx.rotate(label.rot * Math.PI / 180);
+                      ctx.translate(-xCenter, -yCenter);
+                      ctx.drawImage(img2, width+spacing, 0, width, width);
+                      ctx.restore();
+                      drawLabel(width, "25 um");
+                    }
+                    img.style.display = "block";
+                    document.getElementById("blob").style.display = "none";
+                    document.getElementById("tile").style.display = "none";
+                </script> 
+
+               
+                <div id="form" style="font-size:100%">
+                    <form id="label-form" action="{{ url_for('label', username_hash=username) }}" method="POST">  
+                        <fieldset>
+                            <div>
+                                <input type="checkbox" name="plaquelabel" id="cored" value="cored">
+                                <label for="cored">Cored</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="plaquelabel" id="diffuse" value="diffuse">
+                                <label for="diffuse">Diffuse</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="plaquelabel" id="CAA" value="CAA">
+                                <label for="CAA">CAA</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="plaquelabel" id="negative" value="negative">
+                                <label for="negative">Negative</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="plaquelabel" id="flag" value="flag">
+                                <label for="flag">Flag</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" name="plaquelabel" id="notsure" value="notsure">
+                                <label for="notsure">Not Sure</label>
+                            </div>
+                            <br/>
+                            <div>
+                                <button type="submit" id="submit" name="next" value="next" class="btn btn-primary ">Next</button>
+                            </div>
+                        </fieldset>
+                    </form>
+
+                    <form id="undo-form" action="{{ url_for('label', username_hash=username) }}" method="POST">
+                        <div>
+                            <button type="submit" id="undo" name="undo" value="undo" class="btn btn-primary ">Undo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+           
+            <script>
+                function myFc() {
+            
+                    var x = window.event.keyCode;
+                    
+                    switch(x){
+                        case 85: //U
+                            document.getElementById("undo").click();
+                            break;
+                        case 67: //C
+                            document.getElementById("cored").click();
+                            break;
+                        case 68: //D
+                            document.getElementById("diffuse").click();
+                            break;
+                        case 65: //79 for O, 65 for A
+                            document.getElementById("CAA").click();
+                            break;
+                        case 49: //1
+                            document.getElementById("notsure").click();
+                            break;
+                        case 70: //F
+                            document.getElementById("flag").click();
+                            break;
+                        case 78: //N
+                            document.getElementById("negative").click();
+                            break;
+                        case 13: //Enter
+                            document.getElementById("submit").click();
+                            break;
+                    }           
+                }
+            </script>
+        </div>
+    </body>
+</html>

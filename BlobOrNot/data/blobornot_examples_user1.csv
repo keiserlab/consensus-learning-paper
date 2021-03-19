@@ -1,0 +1,4 @@
+blobs,cored,diffuse,CAA,10xfields,coords,rotation
+path/to/blob/image/in/awsS3bucket/filename1.jpg,user2,path/to/10xfield/image/in/awsS3bucket/filename1.jpg,[591 764 256 256],0
+path/to/blob/image/in/awsS3bucket/filename2.jpg,user2,path/to/10xfield/image/in/awsS3bucket/filename2.jpg,[1280 1164 256 256],90
+path/to/blob/image/in/awsS3bucket/filename3.jpg,user2,path/to/10xfield/image/in/awsS3bucket/filename3.jpg,[370   0 256 256],180
