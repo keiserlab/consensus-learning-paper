@@ -90,6 +90,7 @@ This folder contains the CSVs for the study <br />
 
 * **utils/** contains image normalization data. <br /> 
 
+* **BlobOrNot/** contains the code repository for the custom online annotation tool deployed to human labelers. <br /> 
 
 
 

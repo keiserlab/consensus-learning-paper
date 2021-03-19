@@ -295,9 +295,9 @@ def plotConsensusGainsHeatMap(comparison="model", eval_set="test_set", exclude_a
     else:
         spaces = ["Self Models", "Consensus Models", "Individual-Expert Models", "All Models"]
     classes = ["cored", "diffuse", "CAA"]
-    grid, z_grid, p_value_grid = [], [], []
+    grid, z_grid, p_value_grid, intervals_grid = [], [], [], []
     for space in spaces:
-        l, z_list, p_list = [], [], []
+        l, z_list, p_list, intervals_list = [], [], [], []
         for c in classes:
             exclude_consensus = True if "Individual" in space else False
             exclude_individuals = True if "Consensus" in space else False
@@ -311,12 +311,19 @@ def plotConsensusGainsHeatMap(comparison="model", eval_set="test_set", exclude_a
             cdf_two_sided = (scipy.stats.norm.cdf(z_val) * 2) - 1 
             p_val = 1 - cdf_one_sided ##we want the one sided with Ho: means are equal, alternative: consensus > individuals
             p_list.append(p_val)
+            ##calculate 95% confidence interval for difference of two means
+            standard_pooled = np.sqrt((((sample_size_individual - 1) * std_individ**2) + (((sample_size_consensus - 1) * std_consensus**2))) / float(sample_size_individual + sample_size_consensus - 2))
+            confidence_width = 1.96 * standard_pooled * np.sqrt((1/float(sample_size_individual)) + (1/float(sample_size_consensus))) #z for 95% confidence 
+            interval = ((avg_consensus - avg_individ) - confidence_width, (avg_consensus - avg_individ) + confidence_width) 
+            intervals_list.append(interval)
         grid.append(l)
         z_grid.append(z_list)
         p_value_grid.append(p_list)
+        intervals_grid.append(intervals_list)
     grid = np.array(grid)
     z_grid = np.array(z_grid)
     p_value_grid = np.array(p_value_grid)
+    intervals_grid = np.array(intervals_grid)
     ##make heatmap graph
     if comparison == "model":
         graph_compare = "Models"
@@ -351,7 +358,8 @@ def plotConsensusGainsHeatMap(comparison="model", eval_set="test_set", exclude_a
             if i == 0: #self benchmarks / top row, does not meet large N criteria, so exclude p-value
                 text = ax.text(j, i, "{}{:.1%}".format(sign, grid[i,j]),  ha="center", va="center", color=fontcolor, fontsize=10, weight=weight)
             else:
-                text = ax.text(j, i, "{}{:.1%}\np={:.1E}".format(sign, grid[i,j], Decimal(p_value_grid[i][j])),  ha="center", va="center", color=fontcolor, fontsize=10, weight=weight)
+                # text = ax.text(j, i, "{}{:.1%}\np={:.1E}".format(sign, grid[i,j], Decimal(p_value_grid[i][j])),  ha="center", va="center", color=fontcolor, fontsize=10, weight=weight)
+                text = ax.text(j, i, "{}{:.1%}\np={:.1E}\n ({:.1%},{:.1%})".format(sign, grid[i,j], Decimal(p_value_grid[i][j]), intervals_grid[i,j][0], intervals_grid[i,j][1]),  ha="center", va="center", color=fontcolor, fontsize=8.5, weight=weight)
             space_sum += grid[i,j]
         space_averages[spaces[i]] = space_sum /float(len(classes))
     ax.set_xticklabels(graph_classes,fontsize=10)
