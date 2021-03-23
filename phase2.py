@@ -371,7 +371,7 @@ def ModelEnrichmentAUPRC_AUROC(toggle="A"):
     #maps key: user, key:AUPRC or AUROC, key: graph_type, key: class, to value: tuple of (list(x axis values), list(y axis values)) note that lists are same size as base_x_metric (interpolation will be performed)
     performance_mapp = {u: {metric: {graph_type: {am_class: -1 for am_class in class_types} for graph_type in graph_types } for metric in ["AUPRC", "AUROC"]} for u in USERS} 
     ##ROC: x: 1 - spec, y: sens, PRC: precision, sensitivity (Recall)
-    base_x_metric = np.linspace(0, 1, 100) #last arg 30 #last arg is how many points to plot when we aggregate  
+    base_x_metric = np.linspace(0, 1, 100) #last arg is how many points to plot when we aggregate  
     ##keep track of class prevalences for figure
     prevalences = {graph_type: {class_type: [] for class_type in class_types} for graph_type in ["individ_benchmark", "consensus_benchmark"]}
     for graph_type in graph_types:
