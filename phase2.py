@@ -363,17 +363,17 @@ def ModelEnrichmentAUPRC_AUROC(toggle="A"):
     USERS = ['UG1', 'UG2', 'NP1', 'NP2', 'NP3', 'NP4', 'NP5']    
     ##map from image to consensus label (according to consensus of 2, for the images enriched by consensus of 2 model) 
     consensus_benchmark_dict =  pickle.load(open("pickles/consensus_benchmark_dict.pkl", "rb"))
-    
     ##individual neuropath model predictions on the image set enriched by consensus
     individual_predictions_on_consensus_dict = pickle.load(open("pickles/individual_predictions_on_consensus_dict.pkl", "rb"))
-    
     ##get performance across each user
     graph_types = ["individ_mod_individ_benchmark", "individ_mod_consensus_benchmark", "consensus_mod_individ_benchmark", "consensus_mod_consensus_benchmark", "novice_mod_individ_benchmark", "novice_mod_consensus_benchmark"]
     class_types = ["cored", "diffuse", "CAA"]
     #maps key: user, key:AUPRC or AUROC, key: graph_type, key: class, to value: tuple of (list(x axis values), list(y axis values)) note that lists are same size as base_x_metric (interpolation will be performed)
     performance_mapp = {u: {metric: {graph_type: {am_class: -1 for am_class in class_types} for graph_type in graph_types } for metric in ["AUPRC", "AUROC"]} for u in USERS} 
     ##ROC: x: 1 - spec, y: sens, PRC: precision, sensitivity (Recall)
-    base_x_metric = np.linspace(0, 1, 30) #last arg is how many points to plot when we aggregate  
+    base_x_metric = np.linspace(0, 1, 100) #last arg 30 #last arg is how many points to plot when we aggregate  
+    ##keep track of class prevalences for figure
+    prevalences = {graph_type: {class_type: [] for class_type in class_types} for graph_type in ["individ_benchmark", "consensus_benchmark"]}
     for graph_type in graph_types:
         for user in USERS:
             if "novice_mod" in graph_type and user not in ["UG1", "UG2"]:
@@ -410,16 +410,22 @@ def ModelEnrichmentAUPRC_AUROC(toggle="A"):
                     predicted_list = list(enrichment_df[class_type])
                     annotation_list = [consensus_benchmark_dict[image.replace("phase1/blobs/", "")][class_type] for image in enrichment_df['tilename']]
                     annotation_list = [1 if x >= 2 else 0 for x in annotation_list] ##consensus of 2
+                prevalences[graph_type[graph_type.find("mod_") + 4:]][class_type].append(sum(annotation_list) / float(len(annotation_list)))
                 fpr, tpr, t = roc_curve(np.array(annotation_list).ravel(), np.array(predicted_list).ravel())
-                tpr = interp(base_x_metric, fpr, tpr)
-                tpr[0] = 0.0
+                ##linearly interpolate to get tpr at specified fpr in base_x_metric
+                function = interp1d(fpr, tpr)
+                new_tpr = function(base_x_metric)
                 precision, recall, t = precision_recall_curve(np.array(annotation_list).ravel(), np.array(predicted_list).ravel())
-                recall = interp(base_x_metric, precision, recall)
-                recall[0] = 1.0 
-                performance_mapp[user]["AUPRC"][graph_type][class_type] = (base_x_metric, recall)#auprc
-                performance_mapp[user]["AUROC"][graph_type][class_type] = (base_x_metric, tpr)# auroc
+                ##linear interpolate to get precision at specified recall in base_x_metric
+                function = interp1d(recall, precision)
+                new_precision = function(base_x_metric)
+                performance_mapp[user]["AUPRC"][graph_type][class_type] = (base_x_metric, new_precision)#auprc
+                performance_mapp[user]["AUROC"][graph_type][class_type] = (base_x_metric, new_tpr)# auroc
     pickle.dump(performance_mapp, open("pickles/phase2_performance_mapp.pkl", "wb"))
-              
+    ##average the prevalences
+    prevalences = {graph_type: {class_type: np.mean(prevalences[graph_type][class_type]) for class_type in class_types} for graph_type in ["individ_benchmark", "consensus_benchmark"]}
+    pickle.dump(prevalences, open("pickles/random_AUPRC_baseline_phase2.pkl", "wb"))
+
 def plotPhase2Performance(toggle="A", separate_amateurs=False, plot_consensus_benchmark=True):
     """
     plots AUROC and AUPRC curves for the phase 2 results
@@ -429,8 +435,9 @@ def plotPhase2Performance(toggle="A", separate_amateurs=False, plot_consensus_be
     PLOT_CONSENSUS_BENCHMARK: whether to include analyses when we use consensus of 2 as an benchmark 
     """
     USERS = ['UG1', 'UG2', 'NP1', 'NP2', 'NP3', 'NP4', 'NP5']    
-    base_x_metric = np.linspace(0, 1, 30) #last arg is how many points to plot when we aggregate  
+    base_x_metric = np.linspace(0, 1, 100) #last arg is how many points to plot when we aggregate  
     performance_mapp = pickle.load(open("pickles/phase2_performance_mapp.pkl", "rb"))
+    prevalences = pickle.load(open("pickles/random_AUPRC_baseline_phase2.pkl", "rb"))
     ##make ROC and PRC plots
     for score_type in ["AUROC", "AUPRC"]:
         for class_type in ["cored", "diffuse", "CAA"]:
@@ -438,7 +445,7 @@ def plotPhase2Performance(toggle="A", separate_amateurs=False, plot_consensus_be
             fig, ax = plt.subplots()
             color_map = {"UG1": "orange", "NP5": "blue", "UG2": "yellow", "NP4": "green", "NP2": "pink", "NP3":"magenta", "NP1": "purple"}    
             if score_type == "AUROC": #plot x = y line for ROC curve
-                ax.plot([0, 1], [0, 1], linestyle = "--", lw=2, color="black", alpha= 0.8)  
+                ax.plot([0, 1], [0, 1], linestyle="--", lw=2, color="black", alpha= 0.8)  
             ys_individ_mod_individ_benchmark, ys_individ_mod_consensus_benchmark, ys_consensus_mod_individ_benchmark, ys_consensus_mod_consensus_benchmark, ys_novice_mod_individ_benchmark, ys_novice_mod_consensus_benchmark = [], [], [], [], [], []
             for user in USERS:
                 if user != "UG1" and user != "UG2":
@@ -459,17 +466,22 @@ def plotPhase2Performance(toggle="A", separate_amateurs=False, plot_consensus_be
             mean_ys_individ_mod_individ_benchmark, mean_ys_individ_mod_consensus_benchmark, mean_ys_consensus_mod_individ_benchmark, mean_ys_consensus_mod_consensus_benchmark, mean_ys_novice_mod_individ_benchmark, mean_ys_novice_mod_consensus_benchmark = ys_individ_mod_individ_benchmark.mean(axis=0), ys_individ_mod_consensus_benchmark.mean(axis=0), ys_consensus_mod_individ_benchmark.mean(axis=0), ys_consensus_mod_consensus_benchmark.mean(axis=0), ys_novice_mod_individ_benchmark.mean(axis=0), ys_novice_mod_consensus_benchmark.mean(axis=0)
             std_ys_individ_mod_individ_benchmark, std_ys_individ_mod_consensus_benchmark, std_ys_consensus_mod_individ_benchmark, std_ys_consensus_mod_consensus_benchmark, std_ys_novice_mod_individ_benchmark, std_ys_novice_mod_consensus_benchmark  = ys_individ_mod_individ_benchmark.std(axis=0), ys_individ_mod_consensus_benchmark.std(axis=0), ys_consensus_mod_individ_benchmark.std(axis=0), ys_consensus_mod_consensus_benchmark.std(axis=0), ys_novice_mod_individ_benchmark.std(axis=0), ys_novice_mod_consensus_benchmark.std(axis=0)
             auc_individ_mod_individ_benchmark, auc_individ_mod_consensus_benchmark, auc_consensus_mod_individ_benchmark, auc_consensus_mod_consensus_benchmark, auc_novice_mod_individ_benchmark, auc_novice_mod_consensus_benchmark = auc(base_x_metric, mean_ys_individ_mod_individ_benchmark), auc(base_x_metric, mean_ys_individ_mod_consensus_benchmark), auc(base_x_metric, mean_ys_consensus_mod_individ_benchmark), auc(base_x_metric, mean_ys_consensus_mod_consensus_benchmark), auc(base_x_metric, mean_ys_novice_mod_individ_benchmark), auc(base_x_metric, mean_ys_novice_mod_consensus_benchmark) 
-            ##fill between 
+            
             props = dict(boxstyle='round', facecolor='white', alpha=0.85)
+            ##fill between 
             if plot_consensus_benchmark:
-                ax.plot(base_x_metric, mean_ys_consensus_mod_consensus_benchmark, '-', color="red", label= "AUC = {}".format(str(auc_consensus_mod_consensus_benchmark)[0:4])) 
+                ax.plot(base_x_metric, mean_ys_consensus_mod_consensus_benchmark, '-', color="red", label= "AUC = {}".format(round(auc_consensus_mod_consensus_benchmark, 2))) 
                 ##consensus mode consensus benchmark will not have a std, sample size = 1
-                ax.plot(base_x_metric, mean_ys_individ_mod_consensus_benchmark,'-', color="purple", label= "AUC = {}".format(str(auc_individ_mod_consensus_benchmark)[0:4]))  
+                ax.plot(base_x_metric, mean_ys_individ_mod_consensus_benchmark,'-', color="purple", label= "AUC = {}".format(round(auc_individ_mod_consensus_benchmark, 2)))  
                 plt.fill_between(base_x_metric, mean_ys_individ_mod_consensus_benchmark - std_ys_individ_mod_consensus_benchmark, mean_ys_individ_mod_consensus_benchmark + std_ys_individ_mod_consensus_benchmark, color='purple', alpha=0.05)
-            ax.plot(base_x_metric, mean_ys_consensus_mod_individ_benchmark, '-', color="gold", label= "AUC = {}".format(str(auc_consensus_mod_individ_benchmark)[0:4]), zorder=3)                      
+                if score_type == "AUPRC":
+                    ax.axhline(y=prevalences["consensus_benchmark"][class_type], linestyle="dashdot", color="black")
+            ax.plot(base_x_metric, mean_ys_consensus_mod_individ_benchmark, '-', color="gold", label= "AUC = {}".format(round(auc_consensus_mod_individ_benchmark, 2)), zorder=3)                      
             plt.fill_between(base_x_metric, mean_ys_consensus_mod_individ_benchmark - std_ys_consensus_mod_individ_benchmark, mean_ys_consensus_mod_individ_benchmark + std_ys_consensus_mod_individ_benchmark, color='gold', alpha=0.05)
-            ax.plot(base_x_metric, mean_ys_individ_mod_individ_benchmark, '-', color="blue", label= "AUC = {}".format(str(auc_individ_mod_individ_benchmark)[0:4]))
+            ax.plot(base_x_metric, mean_ys_individ_mod_individ_benchmark, '-', color="blue", label= "AUC = {}".format(round(auc_individ_mod_individ_benchmark, 2)))
             plt.fill_between(base_x_metric, mean_ys_individ_mod_individ_benchmark - std_ys_individ_mod_individ_benchmark, mean_ys_individ_mod_individ_benchmark + std_ys_individ_mod_individ_benchmark, color='blue', alpha=0.05)
+            if score_type == "AUPRC":
+                ax.axhline(y=prevalences["individ_benchmark"][class_type], linestyle="dotted", color="grey")
             if separate_amateurs:
                 if plot_consensus_benchmark:
                     ax.plot(base_x_metric, mean_ys_novice_mod_consensus_benchmark, '-', color="darkolivegreen", label= "Novice Models, Consensus benchmark, AUC = {}".format(str(auc_novice_mod_consensus_benchmark)[0:4]))  
@@ -480,8 +492,8 @@ def plotPhase2Performance(toggle="A", separate_amateurs=False, plot_consensus_be
                 ax.set_xlabel("FPR", fontsize=14)
                 ax.set_ylabel("TPR", fontsize=14) 
             if score_type == "AUPRC":
-                ax.set_xlabel("Precision", fontsize=14)
-                ax.set_ylabel("Recall", fontsize=14) 
+                ax.set_xlabel("Recall", fontsize=14)
+                ax.set_ylabel("Precision", fontsize=14) 
             plt.ylim(0, 1.0)
             plt.xlim(0, 1.0)
             caps = {"cored": "Cored", "diffuse":"Diffuse", "CAA":"CAA"}    
@@ -491,7 +503,7 @@ def plotPhase2Performance(toggle="A", separate_amateurs=False, plot_consensus_be
                 plt.title("Precision Recall: {}".format(caps[class_type]), fontsize=16)
             ##lower left legend
             if score_type == "AUPRC":
-                ax.legend(loc='lower left', fontsize=10)
+                ax.legend(loc='lower left', fontsize=10, framealpha=.95)
             if score_type == "AUROC":
                 ax.legend(loc='lower right', fontsize=10)
             plt.savefig("figures/enrichment_curve_toggle_{}_{}_{}.png".format(toggle, score_type, class_type), dpi=300)
@@ -516,13 +528,13 @@ def plotAverageDifferentials(toggle="A"):
             user_consensus_auroc = []
             for user in PROFESSIONALS:
                 x,y = performance_mapp[user]["AUPRC"]["individ_mod_" + benchmark_type][class_type]
-                uiauprc = auc(y, x)
+                uiauprc = auc(x, y)
                 user_individ_auprc.append(uiauprc)
                 x,y = performance_mapp[user]["AUROC"]["individ_mod_" + benchmark_type][class_type]
                 uiauroc = auc(x, y)
                 user_individ_auroc.append(uiauroc)
                 x,y = performance_mapp[user]["AUPRC"]["consensus_mod_" + benchmark_type][class_type]
-                ucauprc = auc(y, x)
+                ucauprc = auc(x, y)
                 user_consensus_auprc.append(ucauprc)
                 x,y = performance_mapp[user]["AUROC"]["consensus_mod_" + benchmark_type][class_type]
                 ucauroc = auc(x,y)
@@ -540,17 +552,11 @@ def plotAverageDifferentials(toggle="A"):
         fig, ax = plt.subplots()
         x = np.arange(3)
         width = .22
-
         xlabels = ["Cored", "Diffuse", "CAA"]
         y_auprc = [differential_dict[am_class]["AUPRC"][0] for am_class in ["cored", "diffuse", "CAA"]]
         y_auprc_err = [differential_dict[am_class]["AUPRC"][1] for am_class in ["cored", "diffuse", "CAA"]]
         y_auroc = [differential_dict[am_class]["AUROC"][0] for am_class in ["cored", "diffuse", "CAA"]]
         y_auroc_err = [differential_dict[am_class]["AUROC"][1] for am_class in ["cored", "diffuse", "CAA"]]
-        print(benchmark_type)
-        print(y_auprc)
-        print(y_auprc_err)
-        print(y_auroc)
-        print(y_auroc_err)
         ax.bar(x, y_auprc, width, yerr=y_auprc_err, capsize=3, color="olivedrab", label="AUPRC")
         ax.bar(x + width, y_auroc, width, yerr=y_auroc_err, capsize=3, color="yellow", label="AUROC")
         if toggle == "A":

@@ -41,6 +41,7 @@ import venn
 import cv2
 import random
 from scipy import interp
+from scipy.interpolate import InterpolatedUnivariateSpline, splprep, splev, interp1d
 
 ##=================================================
 #1) CORE CLASSES
