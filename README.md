@@ -21,7 +21,7 @@ scikit-learn 0.21.2<br />
 scikit-image 0.15.0<br />
 scipy 1.3.0<br />
 <br />
-It is important to note that for preprocessing the WSIs, PyVips, libgsf-dev, and libvips must be the exactly the versions as specified, else results will differ slightly. For a detailed README on these packages and installing, please see pyvips_install_readme. 
+It is important to note that for preprocessing the WSIs, PyVips, libgsf-dev, and libvips must be the exactly the versions as specified, else results will differ slightly. For a detailed README on these packages and installing, please see pyvips_install_readme. Total installation time should take no more than a few minutes. 
 
 ## Hardware Requirements:
 All deep learning models were trained using Nvidia Geforce GTX 1080 GPUs
@@ -36,7 +36,7 @@ All deep learning models were trained using Nvidia Geforce GTX 1080 GPUs
 
 * **core.py** Contains the core class and method definitions for the whole study.<br />
 
-* **figure.py** Plots the figures shown in the paper.<br />
+* **figure.py** Plots the figures shown in the paper. Execution should be quick and requires no special hardware. The functions in this script should take no more than a few minutes total to run on a normal desktop. <br />
 
 * **train.py** Contains code for training both the single CNNs as well as the ensemble CNNs.<br />
 

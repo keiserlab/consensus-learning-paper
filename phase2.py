@@ -410,7 +410,8 @@ def ModelEnrichmentAUPRC_AUROC(toggle="A"):
                     predicted_list = list(enrichment_df[class_type])
                     annotation_list = [consensus_benchmark_dict[image.replace("phase1/blobs/", "")][class_type] for image in enrichment_df['tilename']]
                     annotation_list = [1 if x >= 2 else 0 for x in annotation_list] ##consensus of 2
-                prevalences[graph_type[graph_type.find("mod_") + 4:]][class_type].append(sum(annotation_list) / float(len(annotation_list)))
+                if "UG" not in user:
+                    prevalences[graph_type[graph_type.find("mod_") + 4:]][class_type].append(sum(annotation_list) / float(len(annotation_list)))
                 fpr, tpr, t = roc_curve(np.array(annotation_list).ravel(), np.array(predicted_list).ravel())
                 ##linearly interpolate to get tpr at specified fpr in base_x_metric
                 function = interp1d(fpr, tpr)

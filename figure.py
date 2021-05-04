@@ -406,8 +406,9 @@ def plotNoviceAndConsensusOf2Stats(amateur="UG1"):
     plt.savefig("figures/CAM_SSIM_scores_{}.png".format(amateur), dpi=300)
    
 def plotNoviceWithConsensusOf2Difference(amateur="UG1", amyloid_class=None):
-    #make figure, line graph for each class, across all thresholds
-    ##make graph
+    """
+    Plots the pixel activations comparing a novice CAM with a consensus-of-two CAM, for a specified AMYLOID_CLASS in (0,1,2)
+    """
     granular_thresholds = list(np.arange(0,20, 2)) + list(np.arange(20, 260, 25)) + [255] #more granular search space
     larger_thresholds = list(np.arange(0,260, 15))  #uniform axis with more spaced out thresholds
     thresh_dict = pickle.load(open("pickles/CAM_threshold_stats_{}_{}.pkl".format(amateur, amyloid_class), "rb"))
@@ -417,9 +418,7 @@ def plotNoviceWithConsensusOf2Difference(amateur="UG1", amyloid_class=None):
             thresholds = granular_thresholds
         else:
             thresholds = larger_thresholds
-        # thresholds = sorted(list(set(larger_thresholds)))
         x = np.arange(len(thresholds))
-
         xlabels = [""] + thresholds
         A = [thresh_dict[t]["A"][0] for t in thresholds]
         A_err = [thresh_dict[t]["A"][1] for t in thresholds]
@@ -435,24 +434,16 @@ def plotNoviceWithConsensusOf2Difference(amateur="UG1", amyloid_class=None):
             ax.errorbar(x, B, color="green", label="novice and consensus agree")
             plt.fill_between(x, np.array(B) - np.array(B_err), np.array(B) + np.array(B_err), color='green', alpha=0.05)
         ax.xaxis.set_major_locator(plt.MaxNLocator(len(thresholds) + 1))
-        # if graph_type == "keep_agreements":
-        #     xfontsize, yfontsize, xrotation = 12, 12, 45
-        # else:
-        #     xfontsize, yfontsize, xrotation = 15, 16, 50
         xfontsize, yfontsize, xrotation = 12, 12, 45
-        
         if graph_type == "keep_agreements":
             ax.set_ylim((0,1))
         else:
             ax.set_ylim((0,.30))   
-
         yvals = ax.get_yticks()
         ax.set_yticklabels(['{:,.0%}'.format(x) for x in yvals], fontsize=yfontsize)
-            
         ax.set_xticklabels(xlabels,fontsize=xfontsize)
         plt.setp(ax.get_xticklabels(), rotation=xrotation, ha="right",rotation_mode="anchor")
         am_types = {0: "Cored", 1:"Diffuse", 2:"CAA"}
-        
         ax.set_xlabel("Pixel Threshold", fontsize=12)
         ax.set_ylabel("Proportion", fontsize=12)  
         plt.title("{}".format(am_types[amyloid_class]), fontsize=14)
@@ -468,7 +459,10 @@ def plotNoviceWithConsensusOf2Difference(amateur="UG1", amyloid_class=None):
             plt.savefig("figures/CAM_overlap_exclude_{}_{}_{}.png".format(graph_type, amateur, amyloid_class), bbox_inches='tight', dpi=300)
 
 def plotSubsetPercentageConsensusOf2WithAmateur(amateur="UG1", amyloid_class=None):
-    ##make graph
+    """
+    Plots a graph comparing 1) how much of a subset the novice CAM is of the consensus-of-two CAM vs
+    2) how much of a subset the consensus-of-two CAM is of the novice CAM for a specified AMYLOID_CLASS in (0,1,2)
+    """
     granular_thresholds = list(np.arange(0,20, 2)) + list(np.arange(20, 260, 25)) + [255] #more granular search space
     thresh_dict = pickle.load(open("pickles/CAM_subset_dict_{}_{}.pk".format(amateur, amyloid_class), "rb"))
     fig, ax = plt.subplots()
@@ -493,7 +487,6 @@ def plotSubsetPercentageConsensusOf2WithAmateur(amateur="UG1", amyloid_class=Non
     ax.set_position([box.x0, box.y0, box.width, box.height * 0.85])
     ax.legend(loc='upper left', fontsize=12, bbox_to_anchor=(-.012, 1.39))
     plt.gcf().subplots_adjust(bottom=0.135, top=.76) #default: left = 0.125, right = 0.9, bottom = 0.1, top = 0.9
-    # plt.tight_layout()
     plt.savefig("figures/CAM_subset_percentages_{}_{}.png".format(amateur, amyloid_class), dpi=300)
 
 def plotEnsembleSuperiority(random_subnet=False, multiple_subnets=False):
@@ -505,7 +498,6 @@ def plotEnsembleSuperiority(random_subnet=False, multiple_subnets=False):
     """
     USERS = ['NP1', 'NP2', 'NP3', 'NP4', 'NP5']
     difference_map = pickle.load(open("pickles/ensemble_superiority_difference_map_random_subnet_{}_multiple_subnets_{}.pkl".format(random_subnet, multiple_subnets), "rb"))
-    ##make summary differential graph 
     fig, ax = plt.subplots()
     width = .27
     am_classes = [0,1,2]
@@ -540,11 +532,6 @@ def plotEnsembleDiffHistograms(single_random=False, multiple_subnets=False):
     print(X.shape)
     fig, ax = plt.subplots()
     colors = ["maroon", "bisque", "darkorange"]
-    # n, bins, patches = ax.hist(X, 20, histtype='bar', color=colors, label=["Cored", "Diffuse", "CAA"]) #side by side bars
-    # n, bins, patches = ax.hist(X, 20, histtype='step', stacked=True, fill=False, color=colors, label=["Cored", "Diffuse", "CAA"]) #unfilled steps
-    # n, bins, patches = ax.hist(X, 10, density=True, histtype='barstacked', stacked=True, color=colors, label=["Cored", "Diffuse", "CAA"])# stacked bars
-    
-
     n, bins, patches = ax.hist(X, 10, histtype='barstacked', stacked=True, color=colors, label=["Cored", "Diffuse", "CAA"])# stacked bars
     n = np.array(n)
     sum_of_rows = n.sum(axis=1)
@@ -564,12 +551,6 @@ def plotEnsembleDiffHistograms(single_random=False, multiple_subnets=False):
     ax.set_ylim(0,1) 
     y_vals = ax.get_yticks()
     ax.set_yticklabels(['{:,.0%}'.format(y) for y in y_vals])  
-
-
-
-
-
-    
     ax.set_ylabel("Frequency", fontsize=10)
     if single_random:
         ax.set_xlabel("|AUPRC Difference|\nBetween Ensemble and Ensemble with Random Labeler", fontsize=10)
