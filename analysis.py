@@ -4,7 +4,7 @@ from figure import *
 
 norm = np.load("utils/normalization.npy", allow_pickle=True).item()
 num_workers = 5
-DATA_DIR = "/srv/nas/mk1/users/dwong/WSIs/tile_seg/blobs/"
+DATA_DIR = "data/tile_seg/blobs/"
 data_transforms = {
     'train': transforms.Compose([
         transforms.RandomHorizontalFlip(),
@@ -23,9 +23,9 @@ data_transforms = {
 weight = torch.FloatTensor([1,1,1]).cuda()
 criterion = nn.MultiLabelSoftMarginLoss(weight=weight, size_average=False)
 
-##=============================================
-## Generate performance results
-##=============================================
+# ##=============================================
+# ## Generate performance results
+# ##=============================================
 grid_test(model_type="all", val_type="test_set", eval_random_ensembles=False, eval_multiple_random=False, data_transforms=data_transforms, criterion=criterion, DATA_DIR=DATA_DIR, num_workers=num_workers) #baseline
 grid_test(model_type="all", val_type="test_set", eval_random_ensembles=True, eval_multiple_random=False, data_transforms=data_transforms, criterion=criterion, DATA_DIR=DATA_DIR, num_workers=num_workers) 
 grid_test(model_type="all", val_type="test_set", eval_random_ensembles=False, eval_multiple_random=True, data_transforms=data_transforms, criterion=criterion, DATA_DIR=DATA_DIR, num_workers=num_workers) 
@@ -84,14 +84,14 @@ plotConsensusGainsHeatMap(comparison="truth", eval_set="test_set", exclude_amate
 ##=============================================
 ## Saliency analysis 
 ##=============================================
-# generateNoviceAndConsensusOf2CAMs(IMG_DIR=DATA_DIR, norm=norm, save_dir="/srv/nas/mk1/users/dwong/WSIs/CAM_images/")
+generateNoviceAndConsensusOf2CAMs(IMG_DIR=DATA_DIR, norm=norm, save_dir="data/CAM_images/")
 for UG in ["UG1", "UG2"]:
-    getAmateurAndConsensusOf2Stats(amateur=UG, truncated=False, image_dir="/srv/nas/mk1/users/dwong/WSIs/CAM_images/")
+    getAmateurAndConsensusOf2Stats(amateur=UG, truncated=False, image_dir="data/CAM_images/")
     plotNoviceAndConsensusOf2Stats(amateur=UG)
     for amyloid_class in [0,1,2]:
-        getAmateurWithConsensusOf2Difference(amateur=UG, amyloid_class=amyloid_class, truncated=False, image_dir="/srv/nas/mk1/users/dwong/WSIs/CAM_images/")
+        getAmateurWithConsensusOf2Difference(amateur=UG, amyloid_class=amyloid_class, truncated=False, image_dir="data/CAM_images/")
         plotNoviceWithConsensusOf2Difference(amateur=UG, amyloid_class=amyloid_class)
-        getSubsetPercentageConsensusOf2WithAmateur(amateur=UG, amyloid_class=amyloid_class, truncated=False, image_dir="/srv/nas/mk1/users/dwong/WSIs/CAM_images/")
+        getSubsetPercentageConsensusOf2WithAmateur(amateur=UG, amyloid_class=amyloid_class, truncated=False, image_dir="data/CAM_images/")
         plotSubsetPercentageConsensusOf2WithAmateur(amateur=UG, amyloid_class=amyloid_class)
 
 ##=============================================
@@ -154,7 +154,7 @@ plotEnsembleWeights(eval_random_subnets=True, eval_amateurs=False, eval_multiple
 getStainUserClassCounts(dataset="test")
 plotStainUserClassCounts(dataset="test")
 
-compareColorNormalizedTestingToUnNormalized(DATA_DIR=DATA_DIR, RAW_DATA_DIR="/srv/nas/mk1/users/dwong/WSIs/unnormalized_tile_seg/", data_transforms=data_transforms, num_workers=num_workers)
+compareColorNormalizedTestingToUnNormalized(DATA_DIR=DATA_DIR, RAW_DATA_DIR="data/unnormalized_tile_seg/", data_transforms=data_transforms, num_workers=num_workers)
 plotColorNormVsUnnormalized()
 
 

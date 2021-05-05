@@ -18,8 +18,8 @@ def tileRawWSIToNormalized1536():
     ref_imagenames['Biels'] = 'NA4092UCDTemporalgyri_Biels.svs'
     ref_imagenames['6E10'] = '50522-3_UTSW_temporal_6E10.svs'
     ref_imagenames['Kofler'] = 'cw18-015.svs'
-    WSI_DIR = '/srv/nas/mk1/users/dwong/WSIs/raw_WSIs/' 
-    SAVE_DIR = '/srv/nas/mk1/users/dwong/WSIs/normalized_tiles/'
+    WSI_DIR = 'data/raw_WSIs/' 
+    SAVE_DIR = 'data/normalized_tiles/'
     wsi_files = os.listdir(WSI_DIR)
     imagenames = sorted(wsi_files)
     stains = {}

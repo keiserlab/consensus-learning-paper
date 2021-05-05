@@ -50,7 +50,7 @@ if unfreeze_amateurs:
 
 norm = np.load("utils/normalization.npy", allow_pickle=True).item()
 
-prefix = "/srv/nas/mk1/users/dwong/WSIs/tile_seg/"
+prefix = "data/tile_seg/"
 num_workers = 16
 
 batch_size = 64

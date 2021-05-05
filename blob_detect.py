@@ -14,8 +14,8 @@ import random
 # Set random seeds
 np.random.seed(42)
 
-IMG_DIR = '/srv/nas/mk1/users/dwong/WSIs/normalized_tiles/' ##ziqis normalized 1536 tiles
-SAVE_DIR = '/srv/nas/mk1/users/dwong/WSIs/tile_seg/'
+IMG_DIR = 'data/normalized_tiles/' ##ziqis normalized 1536 tiles
+SAVE_DIR = 'data/tile_seg/'
 BLOBS_DIR = SAVE_DIR + 'blobs/'
 IMG_BBOXES = SAVE_DIR + 'blobs_bboxes/'
 NEGATIVES = SAVE_DIR + 'negatives/'

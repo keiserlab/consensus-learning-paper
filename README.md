@@ -3,8 +3,9 @@
 author: Daniel Wong (wongdanr@gmail.com)
 
 ## Open access image data
-https://osf.io/xh2jd/ <br />
-Identifier: (place here when publish)
+all necessary images for the study are found here, and are publicly and freely available to use: https://osf.io/xh2jd/ <br />
+Digital Object Identifier: 10.17605/OSF.IO/XH2JD <br />
+The images can be downloaded in bulk directly as .zip files. Unzip each of the .zip files, and place each unzipped directory into a new data directory called "data/".  <br />
 
 ## The following python packages are required: 
 pyvips 2.1.2  <br />
@@ -21,10 +22,10 @@ scikit-learn 0.21.2<br />
 scikit-image 0.15.0<br />
 scipy 1.3.0<br />
 <br />
-It is important to note that for preprocessing the WSIs, PyVips, libgsf-dev, and libvips must be the exactly the versions as specified, else results will differ slightly. For a detailed README on these packages and installing, please see pyvips_install_readme. Total installation time should take no more than a few minutes. 
+It is important to note that for preprocessing the WSIs, PyVips, libgsf-dev, and libvips must be the exactly the versions as specified, else results will differ slightly. For a detailed README on these packages and installing, please see pyvips_install_readme. Total installation time should take no more than a few minutes. We used version 7 of the CentOS Linux operating system.
 
 ## Hardware Requirements:
-All deep learning models were trained using Nvidia Geforce GTX 1080 GPUs
+All deep learning models were trained using Nvidia Geforce GTX 1080 GPUs.
 
 ## Code:
 

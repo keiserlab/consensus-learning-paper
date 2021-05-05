@@ -142,7 +142,7 @@ class DataSetTests(unittest.TestCase):
                 j += 1
                 if j > 100:
                     break
-                img_as_img = Image.open("/srv/nas/mk1/users/dwong/WSIs/tile_seg/blobs/" + image)
+                img_as_img = Image.open("data/tile_seg/blobs/" + image)
                 img_as_img = data_transforms(img_as_img)
                 outputs = model(img_as_img.view(1, 3, 256, 256).cuda())
                 predictions = torch.sigmoid(outputs).type(torch.cuda.FloatTensor).tolist()[0]
@@ -344,10 +344,10 @@ class FigureTests(unittest.TestCase):
                 user_consensus_auprc = []
                 for user in ['NP1', 'NP2', 'NP3', 'NP4', 'NP5']: 
                     x,y = performance_mapp[user]["AUPRC"]["individ_mod_" + benchmark_type][class_type]
-                    uiauprc = auc(y, x)
+                    uiauprc = auc(x, y)
                     user_individ_auprc.append(uiauprc)
                     x,y = performance_mapp[user]["AUPRC"]["consensus_mod_" + benchmark_type][class_type]
-                    ucauprc = auc(y, x)
+                    ucauprc = auc(x, y)
                     user_consensus_auprc.append(ucauprc)
                 self.assertTrue(np.mean(user_individ_auprc) < np.mean(user_consensus_auprc))
 
@@ -359,10 +359,10 @@ class FigureTests(unittest.TestCase):
         performance_mapp = pickle.load(open("pickles/phase2_performance_mapp.pkl", "rb"))
         for class_type in ["cored", "diffuse", "CAA"]:    
             consensus_mod_consensus_benchmark_x, consensus_mod_consensus_benchmark_y  = performance_mapp["NP1"]["AUPRC"]["consensus_mod_consensus_benchmark"][class_type]
-            consensus_mod_consensus_benchmark_auprc = auc(consensus_mod_consensus_benchmark_y, consensus_mod_consensus_benchmark_x)
+            consensus_mod_consensus_benchmark_auprc = auc(consensus_mod_consensus_benchmark_x, consensus_mod_consensus_benchmark_y)
             for user in ['NP2', 'NP3', 'NP4', 'NP5']:
                 x,y = performance_mapp[user]["AUPRC"]["consensus_mod_consensus_benchmark"][class_type]
-                auprc = auc(y,x)
+                auprc = auc(x,y)
                 self.assertTrue(consensus_mod_consensus_benchmark_auprc == auprc)
 
 class HelperFunctionTests(unittest.TestCase):
