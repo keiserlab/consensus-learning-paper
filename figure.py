@@ -324,6 +324,7 @@ def plotConsensusGainsHeatMap(comparison="model", eval_set="test_set", exclude_a
     z_grid = np.array(z_grid)
     p_value_grid = np.array(p_value_grid)
     intervals_grid = np.array(intervals_grid)
+    print("grid: ",grid)
     ##make heatmap graph
     if comparison == "model":
         graph_compare = "Models"
@@ -899,6 +900,35 @@ def plotColorNormVsUnnormalized():
     ax.legend(loc='upper right', fontsize=9, bbox_to_anchor=(1, 1.30))
     plt.gcf().subplots_adjust(top=.76)   
     plt.savefig("figures/comparing_color_norm_vs_unnorm.png", dpi=300)
+
+def plotTrainLossCurve():
+    """
+    Plots the consensus of 2 fold 3 model train and loss curves
+    """
+    train_loss = []
+    validation_loss = []
+    with open("train_loss_curve.txt") as f:
+        lines = f.readlines()
+        for line in lines:
+            if "train Loss" in line:
+                train_loss.append(float(line.split("train Loss: ")[1]))
+            if "dev Loss" in line:
+                validation_loss.append(float(line.split("dev Loss: ")[1]))
+    fig, ax = plt.subplots()
+    x = list(range(0, len(train_loss)))
+    xlabels = ['null'] + list(range(0, len(train_loss)))
+    ax.plot(x, train_loss, label = "training loss", color='blue')
+    ax.plot(x, validation_loss, label = "validation loss", color='orange')
+    ax.set_xlabel("Epoch", fontsize=10)
+    ax.set_ylabel("MultiLabel Soft Margin Loss", fontsize=10)
+    plt.title("Training and Validation Loss\nfor Consensus-of-Two Model", fontsize=14, y = 1.01)
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0, box.width, box.height * 0.85])
+    ax.legend(loc='upper right', fontsize=9, bbox_to_anchor=(1, 1.33))
+    plt.gcf().subplots_adjust(top=.76)   
+    plt.savefig("figures/train_loss_curve_c2.png", dpi=300)
+
+
 
 
 

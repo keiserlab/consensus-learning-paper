@@ -1,0 +1,494 @@
+2 3
+
+Epoch 0/59
+----------
+/home/ziqi/miniconda3/envs/pytorch/lib/python3.6/site-packages/torch/serialization.py:193: UserWarning: Couldn't retrieve source code for container of type Net. It won't be checked for correctness upon loading.
+  "type " + obj.__name__ + ". It won't be checked "
+train Loss: 1.1369
+ Cored: 0.7987 Diffuse: 0.7888 CAA: 0.8996
+best auprc:  0.3691998832028965
+dev Loss: 0.4295
+ Cored: 0.9323 Diffuse: 0.9581 CAA: 0.9813
+train, Epoch time 0m 39s
+
+Epoch 1/59
+----------
+train Loss: 0.8694
+ Cored: 0.8461 Diffuse: 0.8332 CAA: 0.9495
+best auprc:  0.46931297573005265
+dev Loss: 0.4389
+ Cored: 0.9383 Diffuse: 0.9543 CAA: 0.9738
+train, Epoch time 0m 39s
+
+Epoch 2/59
+----------
+train Loss: 0.7796
+ Cored: 0.8624 Diffuse: 0.8473 CAA: 0.9591
+best auprc:  0.47632152027001173
+dev Loss: 0.5918
+ Cored: 0.9458 Diffuse: 0.9323 CAA: 0.9031
+train, Epoch time 0m 39s
+
+Epoch 3/59
+----------
+train Loss: 0.7103
+ Cored: 0.8793 Diffuse: 0.8579 CAA: 0.9635
+best auprc:  0.529080126470596
+dev Loss: 0.3890
+ Cored: 0.9298 Diffuse: 0.9620 CAA: 0.9879
+train, Epoch time 0m 39s
+
+Epoch 4/59
+----------
+train Loss: 0.6387
+ Cored: 0.8919 Diffuse: 0.8705 CAA: 0.9698
+best auprc:  0.6145440878756474
+dev Loss: 0.3075
+ Cored: 0.9645 Diffuse: 0.9595 CAA: 0.9730
+train, Epoch time 0m 39s
+
+Epoch 5/59
+----------
+train Loss: 0.5820
+ Cored: 0.9027 Diffuse: 0.8847 CAA: 0.9741
+dev Loss: 0.4827
+ Cored: 0.9488 Diffuse: 0.9515 CAA: 0.9367
+train, Epoch time 0m 39s
+
+Epoch 6/59
+----------
+train Loss: 0.5414
+ Cored: 0.9112 Diffuse: 0.8929 CAA: 0.9745
+best auprc:  0.7295554280546198
+dev Loss: 0.3021
+ Cored: 0.9447 Diffuse: 0.9639 CAA: 0.9950
+train, Epoch time 0m 39s
+
+Epoch 7/59
+----------
+train Loss: 0.5096
+ Cored: 0.9163 Diffuse: 0.9005 CAA: 0.9780
+best auprc:  0.7311218373045234
+dev Loss: 0.3060
+ Cored: 0.9419 Diffuse: 0.9675 CAA: 0.9928
+train, Epoch time 0m 39s
+
+Epoch 8/59
+----------
+train Loss: 0.4919
+ Cored: 0.9199 Diffuse: 0.9048 CAA: 0.9797
+best auprc:  0.738553075282848
+dev Loss: 0.2432
+ Cored: 0.9631 Diffuse: 0.9645 CAA: 0.9909
+train, Epoch time 0m 39s
+
+Epoch 9/59
+----------
+train Loss: 0.4623
+ Cored: 0.9231 Diffuse: 0.9107 CAA: 0.9813
+dev Loss: 0.2442
+ Cored: 0.9598 Diffuse: 0.9692 CAA: 0.9909
+train, Epoch time 0m 39s
+
+Epoch 10/59
+----------
+train Loss: 0.3926
+ Cored: 0.9351 Diffuse: 0.9241 CAA: 0.9864
+best auprc:  0.7643760901607743
+dev Loss: 0.2910
+ Cored: 0.9504 Diffuse: 0.9681 CAA: 0.9928
+train, Epoch time 0m 39s
+
+Epoch 11/59
+----------
+train Loss: 0.3700
+ Cored: 0.9375 Diffuse: 0.9298 CAA: 0.9894
+dev Loss: 0.2770
+ Cored: 0.9546 Diffuse: 0.9664 CAA: 0.9901
+train, Epoch time 0m 39s
+
+Epoch 12/59
+----------
+train Loss: 0.3616
+ Cored: 0.9399 Diffuse: 0.9300 CAA: 0.9897
+dev Loss: 0.2699
+ Cored: 0.9471 Diffuse: 0.9714 CAA: 0.9942
+train, Epoch time 0m 39s
+
+Epoch 13/59
+----------
+train Loss: 0.3606
+ Cored: 0.9393 Diffuse: 0.9313 CAA: 0.9896
+dev Loss: 0.3201
+ Cored: 0.9438 Diffuse: 0.9620 CAA: 0.9895
+train, Epoch time 0m 39s
+
+Epoch 14/59
+----------
+train Loss: 0.3499
+ Cored: 0.9404 Diffuse: 0.9335 CAA: 0.9905
+best auprc:  0.7723196069980042
+dev Loss: 0.2702
+ Cored: 0.9620 Diffuse: 0.9675 CAA: 0.9851
+train, Epoch time 0m 39s
+
+Epoch 15/59
+----------
+train Loss: 0.3453
+ Cored: 0.9394 Diffuse: 0.9339 CAA: 0.9912
+dev Loss: 0.3098
+ Cored: 0.9460 Diffuse: 0.9579 CAA: 0.9909
+train, Epoch time 0m 39s
+
+Epoch 16/59
+----------
+train Loss: 0.3294
+ Cored: 0.9436 Diffuse: 0.9369 CAA: 0.9922
+best auprc:  0.7873699607734526
+dev Loss: 0.3214
+ Cored: 0.9381 Diffuse: 0.9667 CAA: 0.9909
+train, Epoch time 0m 39s
+
+Epoch 17/59
+----------
+train Loss: 0.3279
+ Cored: 0.9428 Diffuse: 0.9385 CAA: 0.9921
+dev Loss: 0.2213
+ Cored: 0.9678 Diffuse: 0.9667 CAA: 0.9926
+train, Epoch time 0m 39s
+
+Epoch 18/59
+----------
+train Loss: 0.3150
+ Cored: 0.9445 Diffuse: 0.9411 CAA: 0.9921
+dev Loss: 0.2352
+ Cored: 0.9639 Diffuse: 0.9681 CAA: 0.9912
+train, Epoch time 0m 39s
+
+Epoch 19/59
+----------
+train Loss: 0.3116
+ Cored: 0.9468 Diffuse: 0.9422 CAA: 0.9932
+dev Loss: 0.3010
+ Cored: 0.9562 Diffuse: 0.9579 CAA: 0.9893
+train, Epoch time 0m 39s
+
+Epoch 20/59
+----------
+train Loss: 0.2808
+ Cored: 0.9511 Diffuse: 0.9484 CAA: 0.9952
+dev Loss: 0.2834
+ Cored: 0.9532 Diffuse: 0.9612 CAA: 0.9917
+train, Epoch time 0m 39s
+
+Epoch 21/59
+----------
+train Loss: 0.2719
+ Cored: 0.9526 Diffuse: 0.9507 CAA: 0.9954
+dev Loss: 0.2570
+ Cored: 0.9612 Diffuse: 0.9642 CAA: 0.9915
+train, Epoch time 0m 39s
+
+Epoch 22/59
+----------
+train Loss: 0.2690
+ Cored: 0.9526 Diffuse: 0.9508 CAA: 0.9951
+dev Loss: 0.2625
+ Cored: 0.9579 Diffuse: 0.9637 CAA: 0.9928
+train, Epoch time 0m 39s
+
+Epoch 23/59
+----------
+train Loss: 0.2671
+ Cored: 0.9523 Diffuse: 0.9512 CAA: 0.9952
+dev Loss: 0.2702
+ Cored: 0.9543 Diffuse: 0.9653 CAA: 0.9953
+train, Epoch time 0m 39s
+
+Epoch 24/59
+----------
+train Loss: 0.2646
+ Cored: 0.9526 Diffuse: 0.9542 CAA: 0.9946
+dev Loss: 0.2719
+ Cored: 0.9584 Diffuse: 0.9626 CAA: 0.9934
+train, Epoch time 0m 39s
+
+Epoch 25/59
+----------
+train Loss: 0.2564
+ Cored: 0.9546 Diffuse: 0.9562 CAA: 0.9953
+dev Loss: 0.3061
+ Cored: 0.9474 Diffuse: 0.9653 CAA: 0.9923
+train, Epoch time 0m 39s
+
+Epoch 26/59
+----------
+train Loss: 0.2561
+ Cored: 0.9536 Diffuse: 0.9557 CAA: 0.9947
+dev Loss: 0.3048
+ Cored: 0.9433 Diffuse: 0.9626 CAA: 0.9920
+train, Epoch time 0m 39s
+
+Epoch 27/59
+----------
+train Loss: 0.2511
+ Cored: 0.9532 Diffuse: 0.9564 CAA: 0.9954
+dev Loss: 0.2711
+ Cored: 0.9595 Diffuse: 0.9642 CAA: 0.9942
+train, Epoch time 0m 39s
+
+Epoch 28/59
+----------
+train Loss: 0.2454
+ Cored: 0.9552 Diffuse: 0.9592 CAA: 0.9954
+dev Loss: 0.2546
+ Cored: 0.9639 Diffuse: 0.9642 CAA: 0.9937
+train, Epoch time 0m 39s
+
+Epoch 29/59
+----------
+train Loss: 0.2441
+ Cored: 0.9542 Diffuse: 0.9578 CAA: 0.9960
+dev Loss: 0.2689
+ Cored: 0.9606 Diffuse: 0.9637 CAA: 0.9876
+train, Epoch time 0m 40s
+
+Epoch 30/59
+----------
+train Loss: 0.2334
+ Cored: 0.9580 Diffuse: 0.9605 CAA: 0.9963
+dev Loss: 0.2721
+ Cored: 0.9568 Diffuse: 0.9650 CAA: 0.9937
+train, Epoch time 0m 39s
+
+Epoch 31/59
+----------
+train Loss: 0.2320
+ Cored: 0.9579 Diffuse: 0.9618 CAA: 0.9962
+dev Loss: 0.2548
+ Cored: 0.9604 Diffuse: 0.9623 CAA: 0.9953
+train, Epoch time 0m 39s
+
+Epoch 32/59
+----------
+train Loss: 0.2258
+ Cored: 0.9591 Diffuse: 0.9629 CAA: 0.9967
+dev Loss: 0.2479
+ Cored: 0.9637 Diffuse: 0.9670 CAA: 0.9945
+train, Epoch time 0m 39s
+
+Epoch 33/59
+----------
+train Loss: 0.2210
+ Cored: 0.9599 Diffuse: 0.9649 CAA: 0.9967
+dev Loss: 0.2870
+ Cored: 0.9518 Diffuse: 0.9631 CAA: 0.9945
+train, Epoch time 0m 39s
+
+Epoch 34/59
+----------
+train Loss: 0.2246
+ Cored: 0.9594 Diffuse: 0.9624 CAA: 0.9966
+dev Loss: 0.2522
+ Cored: 0.9631 Diffuse: 0.9667 CAA: 0.9926
+train, Epoch time 0m 39s
+
+Epoch 35/59
+----------
+train Loss: 0.2183
+ Cored: 0.9591 Diffuse: 0.9665 CAA: 0.9965
+dev Loss: 0.2563
+ Cored: 0.9628 Diffuse: 0.9656 CAA: 0.9926
+train, Epoch time 0m 39s
+
+Epoch 36/59
+----------
+train Loss: 0.2170
+ Cored: 0.9602 Diffuse: 0.9647 CAA: 0.9964
+dev Loss: 0.2703
+ Cored: 0.9609 Diffuse: 0.9634 CAA: 0.9934
+train, Epoch time 0m 39s
+
+Epoch 37/59
+----------
+train Loss: 0.2166
+ Cored: 0.9608 Diffuse: 0.9658 CAA: 0.9967
+dev Loss: 0.2521
+ Cored: 0.9604 Diffuse: 0.9653 CAA: 0.9953
+train, Epoch time 0m 39s
+
+Epoch 38/59
+----------
+train Loss: 0.2154
+ Cored: 0.9609 Diffuse: 0.9650 CAA: 0.9968
+dev Loss: 0.2705
+ Cored: 0.9587 Diffuse: 0.9637 CAA: 0.9939
+train, Epoch time 0m 39s
+
+Epoch 39/59
+----------
+train Loss: 0.2131
+ Cored: 0.9599 Diffuse: 0.9660 CAA: 0.9967
+dev Loss: 0.2677
+ Cored: 0.9626 Diffuse: 0.9601 CAA: 0.9906
+train, Epoch time 0m 39s
+
+Epoch 40/59
+----------
+train Loss: 0.2104
+ Cored: 0.9614 Diffuse: 0.9655 CAA: 0.9969
+dev Loss: 0.2645
+ Cored: 0.9612 Diffuse: 0.9642 CAA: 0.9937
+train, Epoch time 0m 39s
+
+Epoch 41/59
+----------
+train Loss: 0.2062
+ Cored: 0.9614 Diffuse: 0.9678 CAA: 0.9970
+dev Loss: 0.2659
+ Cored: 0.9595 Diffuse: 0.9659 CAA: 0.9945
+train, Epoch time 0m 39s
+
+Epoch 42/59
+----------
+train Loss: 0.2060
+ Cored: 0.9611 Diffuse: 0.9676 CAA: 0.9971
+dev Loss: 0.2690
+ Cored: 0.9593 Diffuse: 0.9626 CAA: 0.9912
+train, Epoch time 0m 39s
+
+Epoch 43/59
+----------
+train Loss: 0.2041
+ Cored: 0.9617 Diffuse: 0.9681 CAA: 0.9969
+dev Loss: 0.2654
+ Cored: 0.9615 Diffuse: 0.9656 CAA: 0.9950
+train, Epoch time 0m 39s
+
+Epoch 44/59
+----------
+train Loss: 0.2017
+ Cored: 0.9610 Diffuse: 0.9698 CAA: 0.9972
+dev Loss: 0.2566
+ Cored: 0.9615 Diffuse: 0.9642 CAA: 0.9939
+train, Epoch time 0m 39s
+
+Epoch 45/59
+----------
+train Loss: 0.2017
+ Cored: 0.9621 Diffuse: 0.9690 CAA: 0.9969
+dev Loss: 0.2547
+ Cored: 0.9620 Diffuse: 0.9653 CAA: 0.9942
+train, Epoch time 0m 39s
+
+Epoch 46/59
+----------
+train Loss: 0.2022
+ Cored: 0.9634 Diffuse: 0.9678 CAA: 0.9973
+dev Loss: 0.2535
+ Cored: 0.9631 Diffuse: 0.9631 CAA: 0.9953
+train, Epoch time 0m 39s
+
+Epoch 47/59
+----------
+train Loss: 0.2045
+ Cored: 0.9621 Diffuse: 0.9667 CAA: 0.9967
+dev Loss: 0.2627
+ Cored: 0.9606 Diffuse: 0.9626 CAA: 0.9945
+train, Epoch time 0m 39s
+
+Epoch 48/59
+----------
+train Loss: 0.2040
+ Cored: 0.9618 Diffuse: 0.9684 CAA: 0.9969
+dev Loss: 0.2605
+ Cored: 0.9615 Diffuse: 0.9645 CAA: 0.9950
+train, Epoch time 0m 39s
+
+Epoch 49/59
+----------
+train Loss: 0.2002
+ Cored: 0.9634 Diffuse: 0.9692 CAA: 0.9972
+dev Loss: 0.2553
+ Cored: 0.9609 Diffuse: 0.9645 CAA: 0.9937
+train, Epoch time 0m 39s
+
+Epoch 50/59
+----------
+train Loss: 0.1979
+ Cored: 0.9634 Diffuse: 0.9697 CAA: 0.9977
+dev Loss: 0.2670
+ Cored: 0.9595 Diffuse: 0.9615 CAA: 0.9942
+train, Epoch time 0m 39s
+
+Epoch 51/59
+----------
+train Loss: 0.1972
+ Cored: 0.9638 Diffuse: 0.9694 CAA: 0.9976
+dev Loss: 0.2631
+ Cored: 0.9612 Diffuse: 0.9626 CAA: 0.9939
+train, Epoch time 0m 39s
+
+Epoch 52/59
+----------
+train Loss: 0.1945
+ Cored: 0.9637 Diffuse: 0.9713 CAA: 0.9976
+dev Loss: 0.2690
+ Cored: 0.9612 Diffuse: 0.9612 CAA: 0.9939
+train, Epoch time 0m 39s
+
+Epoch 53/59
+----------
+train Loss: 0.1966
+ Cored: 0.9641 Diffuse: 0.9712 CAA: 0.9971
+dev Loss: 0.2607
+ Cored: 0.9606 Diffuse: 0.9620 CAA: 0.9948
+train, Epoch time 0m 39s
+
+Epoch 54/59
+----------
+train Loss: 0.2014
+ Cored: 0.9623 Diffuse: 0.9691 CAA: 0.9968
+dev Loss: 0.2593
+ Cored: 0.9617 Diffuse: 0.9606 CAA: 0.9948
+train, Epoch time 0m 39s
+
+Epoch 55/59
+----------
+train Loss: 0.1943
+ Cored: 0.9635 Diffuse: 0.9700 CAA: 0.9971
+dev Loss: 0.2638
+ Cored: 0.9617 Diffuse: 0.9617 CAA: 0.9945
+train, Epoch time 0m 39s
+
+Epoch 56/59
+----------
+train Loss: 0.1959
+ Cored: 0.9641 Diffuse: 0.9698 CAA: 0.9971
+dev Loss: 0.2542
+ Cored: 0.9623 Diffuse: 0.9637 CAA: 0.9939
+train, Epoch time 0m 39s
+
+Epoch 57/59
+----------
+train Loss: 0.1951
+ Cored: 0.9641 Diffuse: 0.9709 CAA: 0.9971
+dev Loss: 0.2572
+ Cored: 0.9626 Diffuse: 0.9645 CAA: 0.9942
+train, Epoch time 0m 39s
+
+Epoch 58/59
+----------
+train Loss: 0.1964
+ Cored: 0.9632 Diffuse: 0.9702 CAA: 0.9973
+dev Loss: 0.2657
+ Cored: 0.9606 Diffuse: 0.9609 CAA: 0.9945
+train, Epoch time 0m 39s
+
+Epoch 59/59
+----------
+train Loss: 0.1937
+ Cored: 0.9619 Diffuse: 0.9705 CAA: 0.9974
+dev Loss: 0.2575
+ Cored: 0.9612 Diffuse: 0.9634 CAA: 0.9945
+train, Epoch time 0m 39s
