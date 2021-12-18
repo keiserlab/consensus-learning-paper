@@ -42,6 +42,7 @@ plotInterraterAgreement(exclude_amateurs=True, phase="phase1", test_set_only=Fal
 #=============================================
 # Consensus Superiority Analysis
 #=============================================
+plotTrainLossCurve()
 getAverageIndividualOrConsensusMetrics()
 getRandomAUPRCBaseline()
 ##calculate consensus vs individual expert models for all 3 amyloid classes
@@ -84,7 +85,7 @@ plotConsensusGainsHeatMap(comparison="truth", eval_set="test_set", exclude_amate
 ##=============================================
 ## Saliency analysis 
 ##=============================================
-generateNoviceAndConsensusOf2CAMs(IMG_DIR=DATA_DIR, norm=norm, save_dir="data/CAM_images/")
+generateAllCAMs(IMG_DIR=DATA_DIR, norm=norm, save_dir="data/CAM_images/")
 for UG in ["UG1", "UG2"]:
     getAmateurAndConsensusOf2Stats(amateur=UG, truncated=False, image_dir="data/CAM_images/")
     plotNoviceAndConsensusOf2Stats(amateur=UG)
