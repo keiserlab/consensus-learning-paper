@@ -77,8 +77,6 @@ This folder contains the CSVs for the study <br />
     *    **image_details_phase2.csv** contains a subset of the output from blob_detect.py pertaining to phase 2 images. Specifies things like plaque coordinates, tile coordinates, etc.<br />
     *    **individualModelPredictionsForConsensusImageSet.csv** contains model predictions on the images enriched for by the consensus-of-two model.<br />
 
-* **CAM_images/** contains the guided Grad-CAM images. <br /> 
-
 * **figures/** is the output directory to save figures. <br /> 
 
 * **outputs/** is a temporary scratch directory. <br /> 

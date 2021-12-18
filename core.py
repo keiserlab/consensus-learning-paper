@@ -747,27 +747,47 @@ def compareConsensusVsIndividual(mapp, eval_set="test_set", amyloid_type=0, comp
     pickle.dump((consensus_entries_avg, consensus_entries_std, consensus_entries_sample_size), open("pickles/comparison_consensus_vs_individual_consensus_stats_{}_{}_{}_exclude_consensus_{}_exclude_amateurs_{}_diagonal_only_{}_consensus_of_2_only_{}_exclude_individuals_{}.pk".format(comparison, eval_set, am_types[amyloid_type], exclude_consensus, exclude_amateurs, diagonal_only, consensus_of_2_only, exclude_individuals), "wb"))
     pickle.dump((individual_entries_avg, individual_entries_std, individual_entries_sample_size), open("pickles/comparison_consensus_vs_individual_individual_stats_{}_{}_{}_exclude_consensus_{}_exclude_amateurs_{}_diagonal_only_{}_consensus_of_2_only_{}_exclude_individuals_{}.pk".format(comparison, eval_set, am_types[amyloid_type], exclude_consensus, exclude_amateurs, diagonal_only, consensus_of_2_only, exclude_individuals), "wb"))
 
-def generateNoviceAndConsensusOf2CAMs(IMG_DIR=None, norm=None, save_dir="CAM_images/"):
+def generateAllCAMs(IMG_DIR=None, norm=None, save_dir="CAM_images/"):
     """
-    Runs through the tst set for each novice, plus consensus of 2 model, and generates the CAM images for each class
+    Runs through the test set for each NP, novice, plus consensus of 2 model, and generates the CAM images for each class
     IMG_DIR: directory where images are located
     NORM: numpy object containing normalization data 
     SAVE_DIR: directory to save images to 
     """
-    novice_mod_name = "models/model_UG1_fold_3_l2.pkl"
-    novice2_mod_name = "models/model_UG2_fold_3_l2.pkl"
-    consensus2_mod_name = "models/model_all_fold_3_thresholding_2_l2.pkl"
-    df = pd.read_csv("csvs/phase1/test_set/entire_test_thresholding_2.csv")
-    images_list = list(df['imagename'])
-    if not os.path.isdir(save_dir + "UG1/"):
-        os.mkdir(save_dir + "UG1/")
-    if not os.path.isdir(save_dir + "UG2/"):
-        os.mkdir(save_dir + "UG2/")
-    if not os.path.isdir(save_dir + "consensus_of_2/"):
-        os.mkdir(save_dir + "consensus_of_2/")
-    getGradCamImages(novice_mod_name, image_list=images_list, save_images=True, target_classes=[0,1,2], norm=norm, IMG_DIR=IMG_DIR, save_dir=save_dir + "UG1/")    
-    getGradCamImages(consensus2_mod_name, image_list=images_list, save_images=True, target_classes=[0,1,2], norm=norm, IMG_DIR=IMG_DIR, save_dir=save_dir + "consensus_of_2/")
-    getGradCamImages(novic2_emod_name, image_list=images_list, save_images=True, target_classes=[0,1,2], norm=norm, IMG_DIR=IMG_DIR, save_dir=save_dir + "UG2/")
+    images_set = set()
+    df_names = ["csvs/phase1/test_set/entire_test_thresholding_2.csv"] + ["csvs/phase1/cross_validation/train_duplicate_fold_{}_thresholding_2.csv".format(i) for i in range(0,4)]
+    for df_name in df_names:
+        df = pd.read_csv(df_name)
+        df_images_set = set(df['imagename'])
+        images_set.update(df_images_set)
+    images_list = list(images_set)
+    for np in ["UG1", "UG2"] + ["consensus_of_2"]:# + ["NP{}".format(i) for i in range(2,6)]: #+ ["UG{}".format(i) for i in range(1, 3)]:
+        ##can use any fold model, if assess on test set 
+        if np != "consensus_of_2":
+            np_mod_name = "models/model_{}_fold_3_l2.pkl".format(np)
+        else:
+            np_mod_name = "model_all_fold_3_thresholding_2_l2.pkl"
+        if not os.path.isdir(save_dir):
+            os.mkdir(save_dir)
+        if not os.path.isdir(save_dir + "{}/".format(np)):
+            os.mkdir(save_dir + "{}/".format(np))
+        ##make 100 random directories in save_dir because writing so many files to a single directory will be very slow as directory gets large
+        for i in range(0, 100):
+            if not os.path.isdir(save_dir + "{}/{}/".format(np, i)):
+                os.mkdir(save_dir + "{}/{}/".format(np, i))
+        ##processing an image list this large is slow, let's break it up
+        step = int(.01 * len(images_list))
+        print("# of images: ", len(images_list))
+        for i in range(0, 100):
+            init_time = time.time()
+            getGradCamImages(np_mod_name, image_list=images_list[i * step : (i+1) * step], save_images=True, target_classes=[0,1,2], norm=norm, IMG_DIR=IMG_DIR, save_dir=save_dir + "{}/".format(np))    
+            print("time_elapsed for this round: ", time.time() - init_time)
+        # ##now unpack all of the images in CAM_images/NP/ subdirectories to CAM_images/NP/ 
+        for subdirectory in os.listdir(save_dir + "{}/".format(np)):
+            for sub_file in os.listdir(save_dir + "{}/{}".format(np, subdirectory)):
+                shutil.move(save_dir + "{}/{}/{}".format(np, subdirectory, sub_file), save_dir + "{}/{}".format(np, sub_file))
+            ##remove temp 100 directories
+            shutil.rmtree(save_dir + "{}/{}".format(np, subdirectory))
 
 def getAmateurAndConsensusOf2Stats(amateur="UG1", truncated=False, image_dir="CAM_images/"):
     """
@@ -1471,9 +1491,14 @@ def getGradCamImages(model_load_name, image_list=None, save_images=True, target_
         file = pd.read_csv(CSV_DIR)
         image_list = list(file[(file['cored'] == 1) & (file['diffuse'] == 1)]['imagename'])[0:15]
     image_list = sorted(image_list)
+    base_save_dir = save_dir
     for img in image_list:
         if img is np.nan:
             continue
+        
+        ##assign one of the 100 subdirectories to save img to  
+        save_dir = base_save_dir + str(np.random.randint(0, 100)) + "/"
+        
         wsi_name = img.split('/')[0]
         source_name = ''.join(img.split('/')[-1].split('.jpg'))
         img_name = wsi_name+'/'+source_name+'.jpg'
@@ -1485,6 +1510,7 @@ def getGradCamImages(model_load_name, image_list=None, save_images=True, target_
         imtensor = transforms.Normalize(norm['mean'], norm['std'])(imtensor)
         imtensor = imtensor.view(1,3,256,256)
         input_img = Variable(imtensor, requires_grad=True)    
+        
         for target_class in target_classes:
             # Guided Grad cam
             gcv2 = GradCam(model.cpu(), target_layer=23)
