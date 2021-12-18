@@ -761,7 +761,7 @@ def generateAllCAMs(IMG_DIR=None, norm=None, save_dir="CAM_images/"):
         df_images_set = set(df['imagename'])
         images_set.update(df_images_set)
     images_list = list(images_set)
-    for np in ["UG1", "UG2"] + ["consensus_of_2"]:# + ["NP{}".format(i) for i in range(2,6)]: #+ ["UG{}".format(i) for i in range(1, 3)]:
+    for np in ["UG1", "UG2"] + ["consensus_of_2"] + ["NP{}".format(i) for i in range(2,6)]:
         ##can use any fold model, if assess on test set 
         if np != "consensus_of_2":
             np_mod_name = "models/model_{}_fold_3_l2.pkl".format(np)
